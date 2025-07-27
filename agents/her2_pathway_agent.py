@@ -16,5 +16,5 @@ def her2_pathway_agent(patient_path):
         print("HER2+ status not confirmed. Clinical decision required.")
 
 if __name__ == "__main__":
-    her2_pathway_agent("patients/her2_patient.json")
+    her2_pathway_agent("data/her2_patient.json")
 
