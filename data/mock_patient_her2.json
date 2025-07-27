@@ -1,1 +1,46 @@
+{
+  "resourceType": "Patient",
+  "id": "example-her2",
+  "name": [
+    {
+      "family": "Doe",
+      "given": ["Jane"]
+    }
+  ],
+  "gender": "female",
+  "birthDate": "1978-04-12",
+  "clinicalStatus": "active",
+  "conditions": [
+    {
+      "code": "C50.911",
+      "display": "Malignant neoplasm of unspecified site of right female breast",
+      "onsetDate": "2023-03-01"
+    }
+  ],
+  "observations": [
+    {
+      "code": "85478-8",
+      "display": "HER2 [Interpretation] in Breast cancer",
+      "value": "Positive",
+      "effectiveDate": "2023-03-05"
+    },
+    {
+      "code": "33762-6",
+      "display": "Estrogen receptor [Presence] in Breast cancer",
+      "value": "Positive",
+      "effectiveDate": "2023-03-05"
+    },
+    {
+      "code": "48676-1",
+      "display": "Progesterone receptor [Presence] in Breast cancer",
+      "value": "Negative",
+      "effectiveDate": "2023-03-05"
+    }
+  ],
+  "medications": [],
+  "provider": {
+    "name": "Dr. Alex Kim",
+    "organization": "Mayo Clinic Oncology"
+  }
+}
 
