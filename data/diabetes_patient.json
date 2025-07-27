@@ -1,0 +1,15 @@
+{
+    "resourceType": "Patient",
+    "id": "patient-002",
+    "name": [{ "given": ["Maria"], "family": "Lopez" }],
+    "gender": "female",
+    "birthDate": "1975-09-15",
+    "conditions": [
+      {
+        "code": "E11.9",
+        "display": "Type 2 diabetes mellitus without complications"
+      }
+    ],
+    "observations": []
+  }
+  
