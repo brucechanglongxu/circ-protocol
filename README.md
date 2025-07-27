@@ -49,6 +49,14 @@ permissions:
 **Level 3:** Universal coordination across agents, platforms.
 **Level 4:** Indirect signals and crowd dynamics (alert when 100 patients with same condition request imaging). 
 
+## CIRC Protocol Levels (L1–L4)
+
+| **CIRC-L1** | Direct Tool Invocation           | Agent uses a single data interface (e.g., FHIR API) to retrieve static patient data and act.     | HL7 FHIR + MCP (Model Context Protocol)   | Agent pulls HER2 result and recommends imaging. No coordination with other agents.   |
+| **CIRC-L2** | Agent-to-Agent Coordination      | Agents communicate directly to coordinate local actions. Schema and protocol must be aligned.    | A2A (Agent-to-Agent RPC)                  | HER2 agent tells scheduling agent to find imaging before oncology consult.           |
+| **CIRC-L3** | Cross-Agent Interoperability     | Agents interoperate across platforms using a shared adapter layer to abstract schema differences.| UAP (Universal Adapter Protocol)          | HER2, diabetes, and referral agents coordinate despite running on different systems. |
+| **CIRC-L4** | Crowd-Aware Routing              | Agents respond to indirect signals about system load, trends, or referral surges.                | REP (Ripple Effect Protocol)              | Agent detects Friday overload and rebooks patient for Thursday to reduce congestion. |
+
+
 # Next Steps
 1. We need a `protocol/` directory with `permissions.yaml` / `capabilities.yaml` describing what each agent can do.
 2. We need `routing_rules.yaml` and `coordination_rules.json` to have ICD-based orchestration.
