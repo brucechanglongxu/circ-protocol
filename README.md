@@ -15,7 +15,7 @@ Input
 }
 ```
 Output
-```css
+```CSS
 [✔] CIRC authorized this request.
 [→] Routing to her2_pathway_agent...
 [✓] Recommendation: Trastuzumab + Pertuzumab + Endocrine Therapy.
