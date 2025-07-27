@@ -14,3 +14,9 @@ Input
   "hormone_status": "ER+ / PR+"
 }
 ```
+Output
+```css
+[✔] CIRC authorized this request.
+[→] Routing to her2_pathway_agent...
+[✓] Recommendation: Trastuzumab + Pertuzumab + Endocrine Therapy.
+```
