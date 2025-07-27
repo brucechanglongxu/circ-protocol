@@ -6,7 +6,7 @@ CIRC: A protocol layer for coordinating clinical agents across systems, specialt
 
 **Agent: HER2 Pathway Agent**
 Input
-```[json]
+```json
 {
   "patient_id": "ABC123",
   "her2_status": "positive",
