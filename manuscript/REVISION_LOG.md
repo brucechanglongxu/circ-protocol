@@ -59,3 +59,15 @@
 - Replaced generic ``human review'' language with an operational escalation contract covering
   ownership, acknowledgement, deadlines, fallback, suspension authority, workload, and closure.
 - Added measurable human-response endpoints and sociotechnical and automation references.
+
+## Revision 4: structured message and architecture
+
+- Added operational definitions for agent, intent, authority, coordination state, and evidence.
+- Added a non-normative `circ.intent.v0` scheduling message with identity, scope, clinical context,
+  preconditions, reversibility, escalation, and provenance fields.
+- Explained how the message can map to FHIR, A2A, or local workflow representations without
+  defining a competing wire protocol.
+- Added an architecture figure showing institutional boundaries, coordination, identity, policy,
+  audit, clinical-state, and human-oversight paths.
+- Kept the design architecture-neutral by treating the illustrated coordination service as one
+  replaceable implementation pattern.

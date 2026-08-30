@@ -9,13 +9,29 @@
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,backgrounds,fit,positioning}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[hidelinks]{hyperref}
 
 \definecolor{circteal}{HTML}{176B87}
+\definecolor{circgold}{HTML}{D99A2B}
+\definecolor{circblue}{HTML}{3B6FB6}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcolumntype{B}[1]{>{\raggedright\arraybackslash\bfseries}p{#1}}
 \newcolumntype{C}[1]{>{\raggedright\arraybackslash\bfseries\color{circteal}}p{#1}}
+\lstdefinestyle{circjson}{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  columns=fullflexible,
+  frame=single,
+  rulecolor=\color{black!35},
+  backgroundcolor=\color{black!2},
+  showstringspaces=false,
+  aboveskip=0.7em,
+  belowskip=0.5em
+}
 \newcommand{\placeholderfigure}[1]{%
   \fbox{\parbox[c][1.55in][c]{0.94\linewidth}{\centering\small\color{gray}%
   Original image unavailable in supplied manuscript text.\\[0.4em]#1}}}
@@ -331,6 +347,93 @@ orders; a supervisory agent may detect conflict; and direct agent-to-agent messa
 across vendors. Protocol-level fields are most useful where information must cross those boundaries,
 but CIRC does not assume that every control belongs in a new protocol or that decentralized agent
 communication is preferable to orchestration.
+
+\subsection{Operational definitions and a coordination message}
+
+The framework becomes testable only when its terms can be recognized in system behavior. We use the
+following operational definitions. An \emph{interaction risk} is a potential or realized failure
+attributable to interdependence among multiple actors, actions, shared state, or resources rather than
+to one output considered in isolation. A \emph{collision} occurs when two or more actions target the
+same state or resource during overlapping validity windows and violate a declared compatibility rule.
+A \emph{scope violation} is an attempted or executed action outside the authorization valid for the
+actor, patient, task, setting, time, and delegated purpose at the decision point. A \emph{dependency
+violation} occurs when an action passes its release gate while a declared prerequisite is absent,
+failed, expired, or based on an incompatible state version. \emph{Failure containment} means that a
+detected fault is held, quarantined, compensated, or reversed before it crosses a predefined patient,
+workflow, resource, or institutional boundary.
+
+Listing~\ref{lst:intent-message} gives one concrete coordination message for an imaging-scheduling
+agent proposing to move an appointment. The example is illustrative rather than a normative CIRC
+wire format. The same fields could be represented through a FHIR profile, an A2A extension, or an
+institutional workflow schema. Patient and encounter references are placeholders, not clinical data.
+
+\begin{lstlisting}[style=circjson,caption={Illustrative structured coordination message.},label={lst:intent-message}]
+{
+  "schema": "circ.intent.v0",
+  "message_id": "urn:uuid:example-message",
+  "idempotency_key": "schedule-change-example-1",
+  "actor": {
+    "agent_id": "agent:scheduling:example",
+    "version": "3.2.1",
+    "issuer": "Organization/institution-a"
+  },
+  "authority": {
+    "action": "schedule.modify",
+    "delegated_by": "PractitionerRole/care-team",
+    "policy": "Policy/outpatient-scheduling-v4"
+  },
+  "subject": {
+    "patient": "Patient/example",
+    "encounter": "Encounter/example"
+  },
+  "state": {
+    "version": "W/example-etag",
+    "observed_at": "2030-01-15T14:30:00Z"
+  },
+  "intent": {
+    "proposed_action": "reschedule imaging",
+    "target": "Task/imaging-example",
+    "reason": "capacity adjustment"
+  },
+  "dependencies": [
+    {"task": "Task/oncology-clearance", "required_state": "completed"},
+    {"task": "Task/observation-visit", "constraint": "must_remain_scheduled"}
+  ],
+  "valid_until": "2030-01-15T15:00:00Z",
+  "reversal": {"action": "restore_prior_slot", "deadline_minutes": 30},
+  "escalation": {
+    "owner_role": "oncology attending",
+    "respond_by": "2030-01-15T14:50:00Z",
+    "on_timeout": "hold"
+  },
+  "signature": "detached-jws:example"
+}
+\end{lstlisting}
+
+The receiver can evaluate this proposal without inferring critical context from free text: it can
+authenticate the actor, evaluate action-specific authority, compare state versions, inspect
+prerequisites, deduplicate retries, enforce expiry, and route unresolved conflict to an accountable
+role. A valid message does not imply a valid clinical decision; it makes the decision context
+inspectable and enforceable.
+
+\subsection{One possible deployment architecture}
+
+Figure~\ref{fig:architecture} shows one centralized realization of the levers. Agents communicate
+through a coordination service or workflow engine, which checks institutional identity and policy,
+binds actions to EHR state, appends audit evidence, and routes escalations to a named human queue. An
+external agent crosses an institutional boundary with a signed, scoped intent message and remains
+subject to local policy. The diagram is not a required topology: the same interfaces may be
+distributed, embedded in the EHR, or divided among existing services.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.98\linewidth}{!}{\input{figures/circ_architecture.tex}}
+\caption{One possible implementation of CIRC governance levers. Identity, authorization, clinical
+state, audit, and human escalation remain institutionally governed even when an external agent uses a
+shared coordination message. The coordination service may be replaced by an EHR-native workflow or
+another architecture that provides equivalent controls and evidence.}
+\label{fig:architecture}
+\end{figure}
 
 \subsection{Implementation patterns and trade-offs}
 
