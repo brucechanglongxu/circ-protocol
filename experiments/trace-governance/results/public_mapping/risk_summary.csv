@@ -1,0 +1,10 @@
+risk_id,risk_family,primary_criteria,primary_percent,scenarios_covered,scenario_percent,secondary_mentions,boundary_review_items
+R-SCOPE,Scope and episode misattribution,4,3.8,4,16.0,8,1
+R-TIME,Temporal misalignment,12,11.5,11,44.0,15,0
+R-PROV,Evidence-provenance substitution,25,24.0,21,84.0,28,0
+R-COVER,Incomplete evidence coverage,8,7.7,8,32.0,11,0
+R-CLASS,Clinical-state misclassification,13,12.5,9,36.0,16,0
+R-RULE,Clinical-rule misapplication,8,7.7,7,28.0,22,2
+R-INFER,Unsupported inference and causal overreach,11,10.6,7,28.0,13,3
+R-UNCERT,Uncertainty suppression and false closure,15,14.4,12,48.0,9,3
+R-CONTEXT,Indication and exception neglect,8,7.7,8,32.0,9,0

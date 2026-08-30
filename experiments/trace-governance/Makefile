@@ -1,4 +1,4 @@
-.PHONY: test lint verify assay
+.PHONY: test lint verify assay mapping
 
 CLINICARE_REPO ?= ../../../clinicare
 
@@ -14,3 +14,7 @@ verify:
 assay:
 	uv run circ-trace --clinicare-repo $(CLINICARE_REPO) run-public-assay \
 		--out results/public_synthetic_assay.json
+
+mapping:
+	uv run --extra analysis circ-trace --clinicare-repo $(CLINICARE_REPO) \
+		run-public-mapping --out-dir results/public_mapping

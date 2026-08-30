@@ -1,0 +1,10 @@
+risk_id,risk_family,definition,excludes
+R-SCOPE,Scope and episode misattribution,Evidence or actions are assigned to the wrong patient episode admission stay index event or analysis boundary.,Wrong time for the correct event is R-TIME.
+R-TIME,Temporal misalignment,The investigation uses the wrong time source sequence window baseline position or pre/post distinction.,Whether an event occurred at all is R-PROV.
+R-PROV,Evidence-provenance substitution,Codes orders summaries or unsupported assertions substitute for evidence of performed events or clinical states.,Incomplete search across appropriate sources is R-COVER.
+R-COVER,Incomplete evidence coverage,The investigation omits required streams values candidates medications complication classes or follow-up.,Retrieved but conflicting or unresolved evidence is R-UNCERT.
+R-CLASS,Clinical-state misclassification,The investigation conflates clinically distinct states such as ordered versus performed or planned versus unplanned.,Formal threshold algorithm or pathway errors are R-RULE.
+R-RULE,Clinical-rule misapplication,The investigation applies an incorrect formula threshold hierarchy composite definition score or pathway.,Ignored contraindications or justified deviations are R-CONTEXT.
+R-INFER,Unsupported inference and causal overreach,The investigation asserts diagnosis intent causation documentation or a general conclusion beyond the available evidence.,Simple substitution of an invalid source is R-PROV.
+R-UNCERT,Uncertainty suppression and false closure,The system returns a definitive conclusion despite missing sparse conflicting or multiply interpretable evidence.,Incomplete retrieval without false closure is R-COVER.
+R-CONTEXT,Indication and exception neglect,The investigation ignores indication contraindication refusal documented justification goals or historical availability.,Generic calculation or pathway errors are R-RULE.

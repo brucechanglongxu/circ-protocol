@@ -21,7 +21,9 @@ from .clinicare import (
 from .endpoints import summarize_by_arm
 from .natural_risks import summarize_natural_risks
 from .protected import load_natural_risk_job, load_protected_job
+from .public_mapping import write_public_mapping_outputs
 from .replay import run_eligible_factorial, run_factorial
+from .review import write_review_comparison
 from .synthetic import generate_public_panel
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -77,6 +79,14 @@ def main() -> int:
     replay_parser = subparsers.add_parser("run-public-assay")
     replay_parser.add_argument("--out", type=Path)
 
+    mapping_parser = subparsers.add_parser("run-public-mapping")
+    mapping_parser.add_argument("--out-dir", type=Path, required=True)
+
+    review_parser = subparsers.add_parser("score-codebook-review")
+    review_parser.add_argument("--reviewer-1", type=Path, required=True)
+    review_parser.add_argument("--reviewer-2", type=Path, required=True)
+    review_parser.add_argument("--out-dir", type=Path, required=True)
+
     protected_parser = subparsers.add_parser("run-protected-replay")
     protected_parser.add_argument("--cohort-csv", type=Path, required=True)
     protected_parser.add_argument(
@@ -92,6 +102,31 @@ def main() -> int:
     args = parser.parse_args()
     if args.command == "verify-public-source":
         _write({"schema": "circ/public-source-verification.v1", **_verify(args.clinicare_repo)}, args.out)
+        return 0
+
+    if args.command == "run-public-mapping":
+        _verify(args.clinicare_repo)
+        criteria = load_process_criteria(args.clinicare_repo)
+        risks = load_risk_taxonomy(ROOT / "configs" / "risk_taxonomy.toml")
+        entries = load_codebook(ROOT / "configs" / "clinicare_must_not_codebook.csv")
+        write_public_mapping_outputs(
+            output_dir=args.out_dir,
+            criteria=criteria,
+            risks=risks,
+            entries=entries,
+        )
+        print(args.out_dir)
+        return 0
+
+    if args.command == "score-codebook-review":
+        risks = load_risk_taxonomy(ROOT / "configs" / "risk_taxonomy.toml")
+        summary = write_review_comparison(
+            first_path=args.reviewer_1,
+            second_path=args.reviewer_2,
+            risks=risks,
+            output_dir=args.out_dir,
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
 
     if args.command == "run-protected-replay":

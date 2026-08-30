@@ -14,6 +14,17 @@ The current 104-row mapping is a complete first pass, not a validated annotation
 5. Version any changed family definition or criterion mapping. Recompute the source and codebook
    digests before protected-trace analysis.
 
+Generate the packets with `make mapping`. After both reviewers complete their respective files:
+
+```bash
+uv run circ-trace score-codebook-review \
+   --reviewer-1 results/public_mapping/reviewer_1.csv \
+   --reviewer-2 results/public_mapping/reviewer_2.csv \
+   --out-dir results/codebook_review
+```
+
+This writes `agreement.json` and a blank-final-label `adjudication.csv` containing only disagreements.
+
 ## Priority review set
 
 Nine rows are marked `boundary` because their primary-family assignment has a plausible alternative:

@@ -1,0 +1,10 @@
+risk_id,advanced-imaging,post-ct-aki,pe-workup,discharge-audit,renal-trajectory,sepsis-bundle,readmission-30d,empiric-abx,med-reconciliation,dka-resolution,hfref-gdmt,stroke-time-targets,he-precipitant,overdose-disposition,icu-delirium,goals-of-care,anticoag-reversal,pneumonia-curb65,hyperkalemia-management,postop-complications,transfusion-audit,eol-goal-concordance,sepsis-source-abx,frequent-admitter,ams-workup
+R-SCOPE,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0
+R-TIME,1,2,0,0,0,1,0,1,0,1,0,1,0,0,0,0,1,1,1,0,1,1,0,0,0
+R-PROV,2,1,0,0,0,1,1,0,1,1,1,1,1,1,1,2,2,1,1,1,1,1,2,1,1
+R-COVER,0,1,0,0,0,0,1,1,1,0,0,0,1,0,1,0,0,0,0,1,0,0,0,1,0
+R-CLASS,0,0,2,0,1,0,2,1,1,0,1,0,0,2,0,0,2,0,0,0,0,0,0,0,1
+R-RULE,0,1,1,0,0,0,0,1,0,1,0,0,1,0,0,0,1,0,0,2,0,0,0,0,0
+R-INFER,0,1,4,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1
+R-UNCERT,1,0,1,2,1,2,0,0,1,0,0,0,1,1,0,1,0,2,0,0,0,1,1,0,0
+R-CONTEXT,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1

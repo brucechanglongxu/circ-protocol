@@ -46,12 +46,18 @@ when the upstream repository is elsewhere.
 ```bash
 make verify
 make assay
+make mapping
 ```
 
 `make assay` runs 25 base traces, four prespecified fault types, and eight factorial control
 arms, producing 1,000 aggregate outcomes. This is an instrument check with known answers. The
 confirmatory study uses protected traces under the protocol in
 [`docs/PREREGISTRATION.md`](docs/PREREGISTRATION.md).
+
+`make mapping` is the low-friction study that can be completed without MIMIC, Docker, or model
+credentials. It writes a public rubric-content analysis, a paper figure, and a randomized blank
+review sheet under `results/public_mapping/`. The development coding must be independently reviewed
+before its counts are presented as final.
 
 The codebook is a preregistration artifact, not an empirical estimate of failure prevalence.
 Counts describe the released rubric design. Failure rates require executed traces and
