@@ -2,8 +2,11 @@
 
 VERSION ?= draft
 PACKAGE_DIR = submission-package
-PACKAGE_ZIP = CIRC_npjDM_resubmission_package.zip
-FINAL_MANUSCRIPT_PDF = CIRC_npjDM_manuscript.pdf
+READY_DIR = READY_TO_SUBMIT
+PACKAGE_ZIP = $(READY_DIR)/CIRC_npjDM_resubmission_package.zip
+FINAL_MANUSCRIPT_PDF = $(READY_DIR)/CIRC_npjDM_manuscript.pdf
+COVER_LETTER_PDF = $(READY_DIR)/CIRC_npjDM_cover_letter.pdf
+RESPONSE_PDF = $(READY_DIR)/CIRC_npjDM_response_to_reviewers.pdf
 
 pdf:
 	mkdir -p build revisions
@@ -17,11 +20,11 @@ npj:
 	$(MAKE) -C npj-preview pdf
 
 editorial:
-	mkdir -p build/cover-letter build/response
+	mkdir -p build/cover-letter build/response $(READY_DIR)
 	latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build/cover-letter COVER_LETTER.tex
 	latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build/response RESPONSE_TO_REVIEWERS.tex
-	cp build/cover-letter/COVER_LETTER.pdf COVER_LETTER.pdf
-	cp build/response/RESPONSE_TO_REVIEWERS.pdf RESPONSE_TO_REVIEWERS.pdf
+	cp build/cover-letter/COVER_LETTER.pdf $(COVER_LETTER_PDF)
+	cp build/response/RESPONSE_TO_REVIEWERS.pdf $(RESPONSE_PDF)
 
 submission: pdf npj editorial
 	rm -rf $(PACKAGE_DIR)
@@ -31,13 +34,15 @@ submission: pdf npj editorial
 	cp npj-preview/main.tex $(PACKAGE_DIR)/manuscript/main.tex
 	cp references.bib $(PACKAGE_DIR)/manuscript/references.bib
 	cp figures/circ_architecture.tex $(PACKAGE_DIR)/figures/circ_architecture.tex
-	cp COVER_LETTER.pdf $(PACKAGE_DIR)/CIRC_npjDM_cover_letter.pdf
-	cp RESPONSE_TO_REVIEWERS.pdf $(PACKAGE_DIR)/CIRC_npjDM_response_to_reviewers.pdf
+	cp $(COVER_LETTER_PDF) $(PACKAGE_DIR)/CIRC_npjDM_cover_letter.pdf
+	cp $(RESPONSE_PDF) $(PACKAGE_DIR)/CIRC_npjDM_response_to_reviewers.pdf
 	cp COVER_LETTER.tex RESPONSE_TO_REVIEWERS.tex RESPONSE_TO_REVIEWERS.md $(PACKAGE_DIR)/editorial/
 	cp SUBMISSION_CHECKLIST.md $(PACKAGE_DIR)/README.md
 	rm -f $(PACKAGE_ZIP)
 	zip -qr $(PACKAGE_ZIP) $(PACKAGE_DIR)
+	rm -rf $(PACKAGE_DIR)
 
 clean:
 	latexmk -C -outdir=build main.tex
-	rm -f main.pdf $(FINAL_MANUSCRIPT_PDF) COVER_LETTER.pdf RESPONSE_TO_REVIEWERS.pdf
+	rm -f main.pdf
+	rm -f $(FINAL_MANUSCRIPT_PDF) $(COVER_LETTER_PDF) $(RESPONSE_PDF) $(PACKAGE_ZIP)
