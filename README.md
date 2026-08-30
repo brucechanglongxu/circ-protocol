@@ -1,6 +1,14 @@
-# CIRC: Clinical Interpretatbility and Routing for Coordination
+# CIRC: Clinical Infrastructure for Reliable Coordination
 
-CIRC (Clinical Interoperability and Routing for Coordination) is a lightweight protocol for integrating AI agents into real-world clinical systems, for coordinating clinical agents across systems, specialties, and institutions. CIRC enables clinical agents to route tasks, interoperate across systems (EHRs, claims, labs) and coordinate across specialties. It focuses on how agents initiate and route tasks—like drafting treatment plans, submitting prior authorizations, or retrieving diagnostic data—while respecting clinical scope, data permissions, and institutional governance. Rather than treating agents as black-box tools, CIRC frames them as structured participants in care delivery. Each agent operates within a defined task boundary and flows through a routing layer that enforces oversight, logs actions, and supports real-time auditability. This makes CIRC agents easier to trust, compose, and regulate inside health systems.
+CIRC (Clinical Infrastructure for Reliable Coordination) is a conceptual governance framework for coordinating clinical AI agents across systems, specialties, and institutions. It focuses on how agents initiate and route tasks while respecting clinical scope, data permissions, and institutional governance. This repository contains early protocol demonstrations and trace-based experiments for evaluating those controls.
+
+## Trace governance experiments
+
+The current empirical work treats scope enforcement, dependency completeness, and citation
+provenance as independent governance levers rather than sequential maturity levels. The
+[trace-governance study](experiments/trace-governance/README.md) provides a preregistered matched
+replay design built on the public CliniCARE-Bench scenarios, a complete risk codebook for its 104
+prohibited process shortcuts, and a protected-data runner for MIMIC-authorized environments.
 
 This matters because most healthcare infrastructure wasn’t built with autonomous agents in mind. Standards like FHIR and HL7 support data exchange, but not continuous, real-time coordination between AI services. To address this, CIRC builds on existing protocols but introduces practical layers to manage task-level autonomy, increasing the agent’s _“circle of influence”_ only when supervision and safeguards allow.
 
@@ -43,6 +51,11 @@ capabilities:
 permissions:
   restricted_to: oncologist-reviewed cases
 ```
+
+## Legacy coordination-level demonstrations
+
+The following levels describe the original demonstration scripts and are not used as a cumulative
+maturity model in the trace-governance study.
 
 **Level 1:** Read-only FHIR API access (similar to MCP)
 **Level 2:** Agent-to-agent communication e.g. diabetes agent hands off to Optho agent.

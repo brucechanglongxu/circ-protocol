@@ -1,0 +1,6 @@
+repository = "https://github.com/scaleapi/clinicare"
+commit = "bbce780bc0dab07aae584f4dbc097601916b0905"
+scenario_rubric_digest = "61bb395de4d53b7dac8dbfe900be184097659aeac4df159c8c76218ae917fda9"
+scenario_count = 25
+criterion_count = 252
+prohibited_criterion_count = 104

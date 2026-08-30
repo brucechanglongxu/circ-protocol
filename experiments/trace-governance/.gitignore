@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+*.egg-info/
+
+# CliniCARE patient-derived artifacts are governed by the PhysioNet DUA.
+jobs/
+traces/
+private/
+full750.csv
+dev148.csv
+*.duckdb
+*.parquet
+
+# Only aggregate, disclosure-reviewed outputs belong under results/.
+results/raw/

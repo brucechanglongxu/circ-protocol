@@ -1,0 +1,10 @@
+{
+  "artifact_id": "synthetic-med-reconciliation-001",
+  "scenario_id": "med-reconciliation",
+  "verdict": "YES",
+  "scope": {
+    "subject_id": "99000001",
+    "hadm_id": "98000001",
+    "stay_id": "97000001"
+  }
+}

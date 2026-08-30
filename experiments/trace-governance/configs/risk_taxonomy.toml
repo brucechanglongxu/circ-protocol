@@ -1,0 +1,72 @@
+schema = "circ/clinical-agent-risk-taxonomy.v1"
+status = "draft-frozen-for-double-review"
+scope = "Observable risks in retrospective clinical-agent audit traces"
+non_exhaustive = true
+
+[[risk]]
+id = "R-SCOPE"
+name = "Scope and episode misattribution"
+definition = "Evidence or actions are assigned to the wrong patient episode admission stay index event or analysis boundary."
+excludes = "Wrong time for the correct event is R-TIME."
+
+[[risk]]
+id = "R-TIME"
+name = "Temporal misalignment"
+definition = "The investigation uses the wrong time source sequence window baseline position or pre/post distinction."
+excludes = "Whether an event occurred at all is R-PROV."
+
+[[risk]]
+id = "R-PROV"
+name = "Evidence-provenance substitution"
+definition = "Codes orders summaries or unsupported assertions substitute for evidence of performed events or clinical states."
+excludes = "Incomplete search across appropriate sources is R-COVER."
+
+[[risk]]
+id = "R-COVER"
+name = "Incomplete evidence coverage"
+definition = "The investigation omits required streams values candidates medications complication classes or follow-up."
+excludes = "Retrieved but conflicting or unresolved evidence is R-UNCERT."
+
+[[risk]]
+id = "R-CLASS"
+name = "Clinical-state misclassification"
+definition = "The investigation conflates clinically distinct states such as ordered versus performed or planned versus unplanned."
+excludes = "Formal threshold algorithm or pathway errors are R-RULE."
+
+[[risk]]
+id = "R-RULE"
+name = "Clinical-rule misapplication"
+definition = "The investigation applies an incorrect formula threshold hierarchy composite definition score or pathway."
+excludes = "Ignored contraindications or justified deviations are R-CONTEXT."
+
+[[risk]]
+id = "R-INFER"
+name = "Unsupported inference and causal overreach"
+definition = "The investigation asserts diagnosis intent causation documentation or a general conclusion beyond the available evidence."
+excludes = "Simple substitution of an invalid source is R-PROV."
+
+[[risk]]
+id = "R-UNCERT"
+name = "Uncertainty suppression and false closure"
+definition = "The system returns a definitive conclusion despite missing sparse conflicting or multiply interpretable evidence."
+excludes = "Incomplete retrieval without false closure is R-COVER."
+
+[[risk]]
+id = "R-CONTEXT"
+name = "Indication and exception neglect"
+definition = "The investigation ignores indication contraindication refusal documented justification goals or historical availability."
+excludes = "Generic calculation or pathway errors are R-RULE."
+
+[limitations]
+not_observable_in_clinicare = [
+    "agent authentication authorization and privilege abuse",
+    "cross-agent handoff conflict deadlock and cascading failure",
+    "population resource congestion and scheduling collisions",
+    "privacy consent and cross-institution disclosure",
+    "unsafe autonomous actuation and rollback failure",
+    "availability failover and coordination-layer outage",
+    "audit-log integrity and repudiation",
+    "fairness and subgroup disparities",
+    "alert fatigue automation bias and diffusion of responsibility",
+    "model drift protocol-version skew and update propagation",
+]

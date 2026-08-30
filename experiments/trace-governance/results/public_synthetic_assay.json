@@ -1,0 +1,268 @@
+{
+  "arm_count": 8,
+  "arms": [
+    {
+      "arm_id": "S0D0P0",
+      "clean_preservation": 1.0,
+      "dependency_gate": false,
+      "fault_containment": 0.0,
+      "fault_containment_by_type": {
+        "fabricated_citation": 0.0,
+        "missing_required_source": 0.0,
+        "required_source_error": 0.0,
+        "wrong_scope": 0.0
+      },
+      "n_clean": 25,
+      "n_faulted": 100,
+      "provenance_gate": false,
+      "scope_enforcement": false
+    },
+    {
+      "arm_id": "S0D0P1",
+      "clean_preservation": 1.0,
+      "dependency_gate": false,
+      "fault_containment": 0.25,
+      "fault_containment_by_type": {
+        "fabricated_citation": 1.0,
+        "missing_required_source": 0.0,
+        "required_source_error": 0.0,
+        "wrong_scope": 0.0
+      },
+      "n_clean": 25,
+      "n_faulted": 100,
+      "provenance_gate": true,
+      "scope_enforcement": false
+    },
+    {
+      "arm_id": "S0D1P0",
+      "clean_preservation": 1.0,
+      "dependency_gate": true,
+      "fault_containment": 0.5,
+      "fault_containment_by_type": {
+        "fabricated_citation": 0.0,
+        "missing_required_source": 1.0,
+        "required_source_error": 1.0,
+        "wrong_scope": 0.0
+      },
+      "n_clean": 25,
+      "n_faulted": 100,
+      "provenance_gate": false,
+      "scope_enforcement": false
+    },
+    {
+      "arm_id": "S0D1P1",
+      "clean_preservation": 1.0,
+      "dependency_gate": true,
+      "fault_containment": 0.75,
+      "fault_containment_by_type": {
+        "fabricated_citation": 1.0,
+        "missing_required_source": 1.0,
+        "required_source_error": 1.0,
+        "wrong_scope": 0.0
+      },
+      "n_clean": 25,
+      "n_faulted": 100,
+      "provenance_gate": true,
+      "scope_enforcement": false
+    },
+    {
+      "arm_id": "S1D0P0",
+      "clean_preservation": 1.0,
+      "dependency_gate": false,
+      "fault_containment": 0.25,
+      "fault_containment_by_type": {
+        "fabricated_citation": 0.0,
+        "missing_required_source": 0.0,
+        "required_source_error": 0.0,
+        "wrong_scope": 1.0
+      },
+      "n_clean": 25,
+      "n_faulted": 100,
+      "provenance_gate": false,
+      "scope_enforcement": true
+    },
+    {
+      "arm_id": "S1D0P1",
+      "clean_preservation": 1.0,
+      "dependency_gate": false,
+      "fault_containment": 0.5,
+      "fault_containment_by_type": {
+        "fabricated_citation": 1.0,
+        "missing_required_source": 0.0,
+        "required_source_error": 0.0,
+        "wrong_scope": 1.0
+      },
+      "n_clean": 25,
+      "n_faulted": 100,
+      "provenance_gate": true,
+      "scope_enforcement": true
+    },
+    {
+      "arm_id": "S1D1P0",
+      "clean_preservation": 1.0,
+      "dependency_gate": true,
+      "fault_containment": 0.75,
+      "fault_containment_by_type": {
+        "fabricated_citation": 0.0,
+        "missing_required_source": 1.0,
+        "required_source_error": 1.0,
+        "wrong_scope": 1.0
+      },
+      "n_clean": 25,
+      "n_faulted": 100,
+      "provenance_gate": false,
+      "scope_enforcement": true
+    },
+    {
+      "arm_id": "S1D1P1",
+      "clean_preservation": 1.0,
+      "dependency_gate": true,
+      "fault_containment": 1.0,
+      "fault_containment_by_type": {
+        "fabricated_citation": 1.0,
+        "missing_required_source": 1.0,
+        "required_source_error": 1.0,
+        "wrong_scope": 1.0
+      },
+      "n_clean": 25,
+      "n_faulted": 100,
+      "provenance_gate": true,
+      "scope_enforcement": true
+    }
+  ],
+  "base_trace_count": 25,
+  "confirmatory_targeted_effects": [
+    {
+      "case_cluster_count": 25,
+      "ci_high": 1.0,
+      "ci_low": 1.0,
+      "confidence_level": 0.9833,
+      "endpoint": "fault_containment",
+      "estimate": 1.0,
+      "fault_kinds": [
+        "wrong_scope"
+      ],
+      "lever": "scope_enforcement",
+      "paired_comparison_count": 100
+    },
+    {
+      "case_cluster_count": 25,
+      "ci_high": 1.0,
+      "ci_low": 1.0,
+      "confidence_level": 0.9833,
+      "endpoint": "fault_containment",
+      "estimate": 1.0,
+      "fault_kinds": [
+        "missing_required_source",
+        "required_source_error"
+      ],
+      "lever": "dependency_gate",
+      "paired_comparison_count": 200
+    },
+    {
+      "case_cluster_count": 25,
+      "ci_high": 1.0,
+      "ci_low": 1.0,
+      "confidence_level": 0.9833,
+      "endpoint": "fault_containment",
+      "estimate": 1.0,
+      "fault_kinds": [
+        "fabricated_citation"
+      ],
+      "lever": "provenance_gate",
+      "paired_comparison_count": 100
+    }
+  ],
+  "faults_per_trace": 4,
+  "interpretation": "software assay only; not an estimate of clinical effectiveness",
+  "outcome_count": 1000,
+  "paired_main_effects": [
+    {
+      "case_cluster_count": 25,
+      "ci_high": 0.25,
+      "ci_low": 0.25,
+      "confidence_level": 0.95,
+      "endpoint": "fault_containment",
+      "estimate": 0.25,
+      "fault_kinds": [],
+      "lever": "scope_enforcement",
+      "paired_comparison_count": 400
+    },
+    {
+      "case_cluster_count": 25,
+      "ci_high": 0.5,
+      "ci_low": 0.5,
+      "confidence_level": 0.95,
+      "endpoint": "fault_containment",
+      "estimate": 0.5,
+      "fault_kinds": [],
+      "lever": "dependency_gate",
+      "paired_comparison_count": 400
+    },
+    {
+      "case_cluster_count": 25,
+      "ci_high": 0.25,
+      "ci_low": 0.25,
+      "confidence_level": 0.95,
+      "endpoint": "fault_containment",
+      "estimate": 0.25,
+      "fault_kinds": [],
+      "lever": "provenance_gate",
+      "paired_comparison_count": 400
+    },
+    {
+      "case_cluster_count": 25,
+      "ci_high": 0.0,
+      "ci_low": 0.0,
+      "confidence_level": 0.95,
+      "endpoint": "base_preservation",
+      "estimate": 0.0,
+      "fault_kinds": [],
+      "lever": "scope_enforcement",
+      "paired_comparison_count": 100
+    },
+    {
+      "case_cluster_count": 25,
+      "ci_high": 0.0,
+      "ci_low": 0.0,
+      "confidence_level": 0.95,
+      "endpoint": "base_preservation",
+      "estimate": 0.0,
+      "fault_kinds": [],
+      "lever": "dependency_gate",
+      "paired_comparison_count": 100
+    },
+    {
+      "case_cluster_count": 25,
+      "ci_high": 0.0,
+      "ci_low": 0.0,
+      "confidence_level": 0.95,
+      "endpoint": "base_preservation",
+      "estimate": 0.0,
+      "fault_kinds": [],
+      "lever": "provenance_gate",
+      "paired_comparison_count": 100
+    }
+  ],
+  "schema": "circ/public-synthetic-assay.v1",
+  "source": {
+    "boundary_review_count": 9,
+    "criterion_count": 252,
+    "primary_mapping_counts": {
+      "R-CLASS": 13,
+      "R-CONTEXT": 8,
+      "R-COVER": 8,
+      "R-INFER": 11,
+      "R-PROV": 25,
+      "R-RULE": 8,
+      "R-SCOPE": 4,
+      "R-TIME": 12,
+      "R-UNCERT": 15
+    },
+    "prohibited_criterion_count": 104,
+    "risk_family_count": 9,
+    "scenario_count": 25,
+    "source_commit": "bbce780bc0dab07aae584f4dbc097601916b0905",
+    "source_digest": "61bb395de4d53b7dac8dbfe900be184097659aeac4df159c8c76218ae917fda9"
+  }
+}

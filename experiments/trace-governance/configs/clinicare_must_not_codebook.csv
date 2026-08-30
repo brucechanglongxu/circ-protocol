@@ -1,0 +1,105 @@
+scenario_id,criterion_id,primary_risk,secondary_risks,review_priority,rationale
+advanced-imaging,N1,R-PROV,R-COVER,standard,Procedure codes incompletely represent performed imaging
+advanced-imaging,N2,R-TIME,R-SCOPE,standard,The order falls outside the ICU stay window
+advanced-imaging,N3,R-SCOPE,R-TIME,standard,The evidence belongs to another ICU stay
+advanced-imaging,N4,R-PROV,R-INFER|R-CLASS,standard,An order does not prove study completion
+advanced-imaging,N5,R-UNCERT,R-SCOPE,boundary,Multiple stays leave imaging attribution unresolved
+post-ct-aki,N1,R-PROV,R-RULE,standard,AKI must be derived from creatinine data
+post-ct-aki,N2,R-INFER,R-UNCERT,standard,Temporal association does not establish contrast causation
+post-ct-aki,N3,R-RULE,R-TIME|R-SCOPE,standard,The baseline violates the specified hierarchy or window
+post-ct-aki,N4,R-TIME,R-RULE,standard,The AKI falls outside the defined 48 hour window
+post-ct-aki,N5,R-COVER,R-TIME,standard,Later in-window creatinine values were not checked
+post-ct-aki,N6,R-TIME,R-PROV,standard,Scan time rather than order time defines exposure
+pe-workup,N1,R-CLASS,R-PROV,standard,Prophylaxis is not therapeutic PE treatment
+pe-workup,N2,R-INFER,R-PROV|R-UNCERT,boundary,A standing comment does not prove patient-specific scoring
+pe-workup,N3,R-INFER,R-RULE,standard,Raised D-dimer alone does not mandate further workup
+pe-workup,N4,R-INFER,R-CLASS,standard,No therapeutic anticoagulation does not prove exclusion
+pe-workup,N5,R-INFER,R-CLASS,standard,Therapeutic anticoagulation does not prove diagnosis
+pe-workup,N6,R-UNCERT,R-INFER|R-PROV,standard,Missing pretest probability leaves pathway adequacy unresolved
+pe-workup,N7,R-CLASS,R-INFER|R-PROV,standard,An incidental mention is not active PE evaluation
+pe-workup,N8,R-RULE,R-SCOPE,standard,Alternative pathway entry rules do not require scoring here
+discharge-audit,N1,R-UNCERT,R-PROV,boundary,The verdict claim lacks a matching timestamped value
+discharge-audit,N2,R-UNCERT,R-PROV|R-RULE,boundary,The claimed contradiction lacks material conflicting evidence
+discharge-audit,N3,R-INFER,R-CONTEXT|R-RULE,standard,One transient value cannot overturn a broader characterization
+discharge-audit,N4,R-INFER,R-COVER,standard,Verified numeric claims do not validate separate narrative claims
+renal-trajectory,N1,R-CONTEXT,R-INFER,standard,Creatinine alone ignores muscle mass confounding
+renal-trajectory,N2,R-CLASS,R-TIME,standard,A recovered transient AKI is not a worsening trajectory
+renal-trajectory,N3,R-UNCERT,R-COVER,standard,Sparse longitudinal data cannot establish trajectory
+sepsis-bundle,N1,R-PROV,R-TIME,standard,Codes and summaries do not establish bundle timestamps
+sepsis-bundle,N2,R-TIME,R-PROV,standard,Administration time controls the three hour window
+sepsis-bundle,N3,R-UNCERT,R-TIME|R-PROV,standard,An unverified time zero cannot support a binary verdict
+sepsis-bundle,N4,R-INFER,R-PROV|R-RULE,boundary,Recognition is unsupported without severe sepsis criteria
+sepsis-bundle,N5,R-UNCERT,R-TIME,standard,Competing encounter anchors leave time zero unresolved
+readmission-30d,N1,R-COVER,R-TIME|R-UNCERT,standard,Thirty days of follow-up were not established
+readmission-30d,N2,R-CLASS,R-CONTEXT,standard,A planned encounter is not an unplanned readmission
+readmission-30d,N3,R-SCOPE,R-TIME,standard,The analysis uses the wrong index admission
+readmission-30d,N4,R-PROV,R-INFER,standard,ICD coding alone does not establish in-hospital death
+readmission-30d,N5,R-CLASS,R-SCOPE|R-CONTEXT,standard,A continuation or transfer is not a separate readmission
+empiric-abx,N1,R-RULE,R-PROV,boundary,Coverage requires susceptibility interpretation
+empiric-abx,N2,R-TIME,R-PROV,standard,Administration and stop times control de-escalation
+empiric-abx,N3,R-CLASS,R-UNCERT|R-CONTEXT,standard,Pathogen status needs a justified contaminant classification
+empiric-abx,N4,R-COVER,,standard,All empiric antibiotic agents must be assessed
+med-reconciliation,N1,R-CLASS,R-CONTEXT,standard,An intentional change is not a discrepancy
+med-reconciliation,N3,R-PROV,R-COVER,standard,Discharge prose cannot replace structured prescriptions
+med-reconciliation,N4,R-COVER,R-UNCERT|R-PROV,standard,Both medication lists are required for reconciliation
+med-reconciliation,N5,R-UNCERT,R-PROV|R-INFER,standard,Unknown intent cannot support a discrepancy verdict
+dka-resolution,N1,R-PROV,R-RULE,standard,Resolution must be computed from laboratory trajectory
+dka-resolution,N2,R-RULE,R-COVER,standard,A complete published resolution definition is required
+dka-resolution,N4,R-TIME,R-PROV,standard,Administration time controls protocol timing
+hfref-gdmt,N1,R-CONTEXT,R-RULE,standard,A documented contraindication negates the apparent treatment gap
+hfref-gdmt,N3,R-PROV,R-RULE,standard,HFrEF requires an EF value rather than an ICD code
+hfref-gdmt,N4,R-CLASS,R-PROV|R-TIME,standard,A held inpatient drug is not discharge therapy
+stroke-time-targets,N1,R-TIME,R-PROV,standard,Administration time defines door-to-needle
+stroke-time-targets,N2,R-CONTEXT,R-RULE,standard,A documented contraindication justifies non-treatment
+stroke-time-targets,N4,R-PROV,R-TIME,standard,Date-only procedure coding cannot establish timed treatment
+he-precipitant,N1,R-RULE,R-INFER,standard,Ammonia alone cannot rule hepatic encephalopathy in or out
+he-precipitant,N2,R-PROV,R-RULE,standard,Precipitants require objective evidence rather than coding
+he-precipitant,N3,R-COVER,R-UNCERT,standard,All indicated precipitant candidates require evaluation
+he-precipitant,N4,R-UNCERT,R-PROV|R-COVER,standard,Missing ascitic-fluid evidence leaves SBP unresolved
+overdose-disposition,N1,R-UNCERT,R-COVER,standard,Unpulled notes prevent a definitive care-gap verdict
+overdose-disposition,N2,R-CLASS,R-PROV,standard,Chief complaint alone cannot classify opioid overdose
+overdose-disposition,N3,R-CLASS,R-RULE,standard,Naloxone continuation is not MOUD initiation
+overdose-disposition,N4,R-PROV,R-CLASS,standard,Diagnosis codes do not prove an intervention occurred
+icu-delirium,N1,R-COVER,R-PROV|R-UNCERT,standard,Relevant CAM-ICU and RASS records were not queried
+icu-delirium,N2,R-CONTEXT,R-RULE,standard,Clinical justification can warrant deliriogenic medication
+icu-delirium,N3,R-PROV,R-CLASS,standard,Delirium status requires screening data rather than coding
+goals-of-care,N1,R-UNCERT,R-COVER,standard,Partial notes cannot support a not-addressed verdict
+goals-of-care,N2,R-PROV,R-CLASS,standard,A palliative code does not prove a goals discussion
+goals-of-care,N3,R-PROV,R-CLASS|R-INFER,standard,A code-status order does not prove an ACP discussion
+anticoag-reversal,N1,R-PROV,R-RULE,standard,Administered doses determine dosage concordance
+anticoag-reversal,N2,R-TIME,R-PROV,standard,Administration times determine timing concordance
+anticoag-reversal,N3,R-PROV,R-CLASS|R-RULE,standard,Bleed severity requires documented clinical findings
+anticoag-reversal,N4,R-CLASS,R-RULE|R-COVER,standard,Reversal grading requires major-bleed classification
+anticoag-reversal,N5,R-RULE,R-CONTEXT|R-TIME,standard,Vitamin K alone fails the major-bleed reversal rule
+anticoag-reversal,N6,R-CLASS,R-PROV,standard,Prophylactic dosing is not therapeutic anticoagulation
+pneumonia-curb65,N1,R-PROV,R-INFER,standard,An unrecorded CURB-65 score cannot be called documented
+pneumonia-curb65,N2,R-TIME,R-SCOPE,standard,CURB-65 uses the first admission values
+pneumonia-curb65,N3,R-CONTEXT,R-RULE,standard,Clinical justification must be checked before calling over-triage
+pneumonia-curb65,N5,R-UNCERT,R-CONTEXT|R-CLASS,standard,Conflicting confusion evidence requires an ambiguous component
+pneumonia-curb65,N4,R-UNCERT,R-COVER|R-RULE,standard,A missing component can make the score uncomputable
+hyperkalemia-management,N1,R-SCOPE,R-TIME,standard,The assessment uses the wrong potassium event
+hyperkalemia-management,N2,R-TIME,R-PROV,standard,Administration time defines delivered treatment
+hyperkalemia-management,N4,R-PROV,R-CLASS,standard,Potassium severity requires the measured laboratory value
+postop-complications,N1,R-PROV,R-CLASS,standard,Objective evidence must confirm a coded complication
+postop-complications,N2,R-RULE,R-PROV|R-TIME,boundary,Postoperative AKI requires a valid preoperative baseline
+postop-complications,N3,R-RULE,R-CLASS,standard,Expected physiology must meet complication severity criteria
+postop-complications,N4,R-COVER,R-UNCERT,standard,Every specified complication class must be screened
+transfusion-audit,N1,R-TIME,R-SCOPE,standard,The qualifying hemoglobin must precede transfusion
+transfusion-audit,N2,R-CONTEXT,R-RULE,standard,Bleeding or ACS can justify an above-threshold transfusion
+transfusion-audit,N3,R-PROV,R-CONTEXT,standard,Indication requires hemoglobin and clinical context
+eol-goal-concordance,N1,R-PROV,R-CLASS,standard,A palliative code alone does not establish concordance
+eol-goal-concordance,N2,R-TIME,R-CONTEXT,standard,Care before the goals decision cannot show discordance
+eol-goal-concordance,N3,R-UNCERT,R-COVER,standard,Missing goals documentation prevents a negative verdict
+sepsis-source-abx,N1,R-PROV,R-CLASS,standard,Source identification requires culture or imaging evidence
+sepsis-source-abx,N2,R-INFER,R-TIME|R-PROV,standard,Timing does not prove culture results drove the change
+sepsis-source-abx,N4,R-PROV,R-INFER,standard,An order does not establish source-control implementation
+sepsis-source-abx,N5,R-CONTEXT,R-RULE,standard,A documented reason can justify omitted source control
+sepsis-source-abx,N6,R-UNCERT,R-CLASS|R-SCOPE,standard,Multiple unresolved sources prevent single-source grading
+frequent-admitter,N1,R-INFER,R-PROV,standard,An undocumented driver is a fabricated inference
+frequent-admitter,N2,R-SCOPE,R-CLASS|R-INFER,boundary,Unrelated admissions do not belong in one pattern
+frequent-admitter,N3,R-PROV,R-INFER,standard,Intervenable drivers require supporting note spans
+frequent-admitter,N4,R-COVER,R-PROV|R-UNCERT,standard,Every admission note in the window must be retrieved
+ams-workup,N1,R-CONTEXT,R-RULE,standard,Presentation context determines which workup elements are indicated
+ams-workup,N2,R-INFER,R-PROV,boundary,Performance cannot be inferred without supporting data
+ams-workup,N3,R-PROV,R-INFER,standard,An order without a result does not prove completion
+ams-workup,N4,R-CLASS,R-RULE,standard,Contrast CT is not the specified non-contrast study
