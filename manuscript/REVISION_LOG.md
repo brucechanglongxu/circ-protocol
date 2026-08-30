@@ -71,3 +71,16 @@
   audit, clinical-state, and human-oversight paths.
 - Kept the design architecture-neutral by treating the illustrated coordination service as one
   replaceable implementation pattern.
+
+## Revision 5: regulatory boundaries and Ripple Effect scope
+
+- Clarified that the Ripple Effect Protocol motivates a population-level failure pattern but does
+  not validate CIRC, establish clinical transfer, or define a required CIRC mechanism.
+- Positioned regulatory status at the level of each software function, intended use, actor role, and
+  deployment context rather than the agent label or system topology.
+- Updated the U.S. discussion with final FDA guidance on clinical decision support and predetermined
+  change control plans for AI-enabled device software functions.
+- Distinguished CIRC evidence from classification, premarket or conformity assessment,
+  institutional deployment decisions, and post-market change control.
+- Added a deployment-dossier and impact-assessment rule for changes to models, actions,
+  dependencies, trust boundaries, populations, resource policies, and human fallbacks.

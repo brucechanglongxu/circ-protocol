@@ -9,6 +9,7 @@
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{placeins}
 \usepackage{listings}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,backgrounds,fit,positioning}
@@ -225,6 +226,13 @@ specified processes, but aggregate demand signals and population-level stress te
 portable across clinical agent ecosystems. This is chiefly an implementation and governance gap:
 institutions may reasonably keep resource arbitration centralized rather than expose it through a
 peer-to-peer protocol.
+
+The Ripple Effect Protocol (REP) motivates this population-level failure pattern but is not evidence
+that CIRC is effective in healthcare. REP exchanges sensitivity signals among agents and reports
+results from nonclinical simulated domains; CIRC neither requires that mechanism nor assumes those
+results transfer to clinical operations. Aggregate demand or sensitivity signals are one candidate
+implementation of resource awareness, and would require separate evaluation of privacy, manipulation,
+allocation fairness, workflow effects, and clinical safety.
 
 \section{A non-exhaustive taxonomy of clinical-agent risk}
 
@@ -572,6 +580,65 @@ reversal rate; unresolved workload per accountable role; and the fraction of con
 executed without documented closure. These measures evaluate the response process rather than merely
 counting alerts.
 
+\section{Regulatory and institutional positioning}
+
+Regulatory status attaches to a software function, its intended use, users, claims, and deployment
+context---not to the labels ``agent'' or ``CIRC'' and not to a centralized or distributed topology.
+In the United States, FDA guidance distinguishes clinical decision support functions that satisfy the
+statutory non-device criteria from software functions that remain devices.\cite{fda2026cds} A
+multi-agent deployment may contain administrative functions, non-device decision support, and device
+software functions at the same time. Each function therefore requires its own assessment, including
+whether combining it with autonomous execution or other agents changes its intended use or risk.
+
+For an AI-enabled device software function, an authorized predetermined change control plan can
+describe specified future modifications, the method for developing, validating, and implementing
+them, and the associated impact assessment.\cite{fda2025pccp} CIRC records such as stable versions,
+delegation, policy decisions, dependency checks, reversals, and post-deployment events could support
+that lifecycle evidence. They do not establish safety or effectiveness, expand the authorized
+intended use, or make an out-of-plan modification permissible.
+
+The European Union AI Act likewise bases obligations on intended purpose, statutory role, and
+classification. For systems classified as high-risk, its requirements include risk management,
+record keeping, human oversight, accuracy, robustness, cybersecurity, quality management, and
+post-market monitoring, with different duties for providers and deployers.\cite{eu2024aiact} CIRC
+levers overlap with several of these operational concerns, but implementing a lever is not itself a
+demonstration of conformity. Privacy, cybersecurity, medical-device, professional-practice, and
+health-system obligations also remain independently applicable.
+
+\begin{table}[htbp]
+\centering
+\caption{Boundary between CIRC evidence and regulatory or institutional decisions.}
+\label{tab:regulatory-boundary}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.19\linewidth}YY}
+\toprule
+Decision layer & Question that must be answered & Role of CIRC \\
+\midrule
+Classification & What is each function's intended use, and which legal category and actor roles
+apply? & Can inventory functions, autonomy, actions, and responsible organizations; does not assign
+legal status. \\
+Premarket or conformity assessment & Is there adequate evidence of safety, performance, and clinical
+benefit for the intended use? & Can expose control operation and trace provenance; does not replace
+analytical, clinical, usability, or system validation. \\
+Institutional deployment & Who may activate, authorize, monitor, pause, and respond to the system in
+this workflow? & Can encode local scope, accountability, escalation, and safe mode; does not transfer
+professional or organizational responsibility. \\
+Change and post-market control & Which modifications are allowed, what requires reassessment, and how
+are emerging risks detected? & Can bind versions to impact assessments and monitoring evidence; does
+not authorize a modification or define the reporting threshold. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\FloatBarrier
+
+Before release, a deployment dossier should therefore map every consequential action to the function
+that proposes and executes it, its intended use and autonomy, the responsible legal and operational
+actors, applicable authorization, validation evidence, dependencies, affected populations, and
+fallback behavior. Changes to a model or agent version, permitted action, dependency, trust boundary,
+patient population, resource policy, or human fallback should trigger a recorded impact assessment
+proportional to the risk. This is an institutional change-control rule, not a claim that every change
+requires a new regulatory submission.
+
 \section{From risk taxonomy to evaluation}
 
 The taxonomy separates three questions that were conflated in the submitted simulations. First, can
@@ -614,11 +681,11 @@ developed and validated as a separate clinical model.
 The threat model and oversight contract identify requirements but do not establish that any proposed
 implementation will satisfy them. Choices about trusted issuers, consistency, emergency exceptions,
 response deadlines, and safe-mode behavior remain institution- and action-specific. Governance
-questions also include liability, regulatory classification, local configuration, alert burden, and
-equitable access. These issues will play out differently under regimes such as the FDA's
-device-centered framework and the European Union's risk-tiered AI Act.\cite{fda2021aiml,eu2024aiact}
-Future work should compare protocol, orchestration, policy-engine, EHR-native, and human-led
-implementations against common risk-specific endpoints.
+questions also include liability, local configuration, alert burden, and equitable access. The
+regulatory discussion above is descriptive rather than legal guidance; applicability depends on the
+specific function, intended use, jurisdiction, and organizational role. Future work should compare
+protocol, orchestration, policy-engine, EHR-native, and human-led implementations against common
+risk-specific endpoints.
 
 \section{Conclusion}
 
