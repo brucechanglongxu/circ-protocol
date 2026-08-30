@@ -1,0 +1,767 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,top=0.62in,bottom=0.7in,left=0.66in,right=0.66in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{placeins}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,backgrounds,fit,positioning}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\columnsep}{0.25in}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\familydefault}{\rmdefault}
+
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+  {-2.3ex \@plus -0.8ex \@minus -.2ex}%
+  {0.9ex \@plus .2ex}%
+  {\normalfont\sffamily\bfseries\normalsize}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+  {-1.8ex \@plus -0.6ex \@minus -.2ex}%
+  {0.6ex \@plus .2ex}%
+  {\normalfont\sffamily\bfseries\normalsize}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+  {-1.4ex \@plus -0.4ex \@minus -.2ex}%
+  {0.4ex \@plus .2ex}%
+  {\normalfont\sffamily\bfseries\small}}
+\renewenvironment{table}[1][tbp]{\@dblfloat{table}[#1]}{\end@dblfloat}
+\renewenvironment{figure}[1][tbp]{\@dblfloat{figure}[#1]}{\end@dblfloat}
+\makeatother
+
+\renewenvironment{abstract}
+  {\par\small\noindent\sffamily\bfseries Abstract\enspace\normalfont\rmfamily}
+  {\par}
+
+\definecolor{circteal}{HTML}{176B87}
+\definecolor{circgold}{HTML}{D99A2B}
+\definecolor{circblue}{HTML}{3B6FB6}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{B}[1]{>{\raggedright\arraybackslash\bfseries}p{#1}}
+\newcolumntype{C}[1]{>{\raggedright\arraybackslash\bfseries\color{circteal}}p{#1}}
+\lstdefinestyle{circjson}{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  columns=fullflexible,
+  frame=single,
+  rulecolor=\color{black!35},
+  backgroundcolor=\color{black!2},
+  showstringspaces=false,
+  aboveskip=0.7em,
+  belowskip=0.5em
+}
+\newcommand{\placeholderfigure}[1]{%
+  \fbox{\parbox[c][1.55in][c]{0.94\linewidth}{\centering\small\color{gray}%
+  Original image unavailable in supplied manuscript text.\\[0.4em]#1}}}
+
+\title{\textbf{Coordination Before Collision: A Governance Framework for Multi-Agent Clinical AI}}
+\author{%
+Bruce Changlong Xu$^{1}$, Ayush Chopra$^{2,3}$, Alexander J. Ryu$^{4}$\\[0.5em]
+\small $^{1}$Stanford University, Palo Alto, California, USA\\
+\small $^{2}$Massachusetts Institute of Technology, Cambridge, Massachusetts, USA\\
+\small $^{3}$Project Iceberg at MIT, Cambridge, Massachusetts, USA\\
+\small $^{4}$Mayo Clinic, Rochester, Minnesota, USA\\[0.5em]
+\small Correspondence: Alexander J. Ryu}
+\date{}
+
+\begin{document}
+
+\twocolumn[
+\begin{minipage}{\textwidth}
+\sffamily
+\noindent{\fontsize{17}{19}\selectfont\bfseries npj Digital Medicine}
+\hfill{\small PERSPECTIVE \textbar{} SUBMISSION PREVIEW}\par
+\vspace{3pt}
+\hrule height 1.1pt
+\vspace{14pt}
+{\fontsize{22}{25}\selectfont\bfseries
+Coordination Before Collision: A Governance Framework for Multi-Agent Clinical AI\par}
+\vspace{10pt}
+{\normalsize Bruce Changlong Xu$^{1}$, Ayush Chopra$^{2,3}$, Alexander J. Ryu$^{4}$\par}
+\vspace{5pt}
+{\footnotesize
+$^{1}$Stanford University, Palo Alto, California, USA.\quad
+$^{2}$Massachusetts Institute of Technology, Cambridge, Massachusetts, USA.\quad
+$^{3}$Project Iceberg at MIT, Cambridge, Massachusetts, USA.\quad
+$^{4}$Mayo Clinic, Rochester, Minnesota, USA.\quad
+Correspondence: Alexander J. Ryu.\par}
+\vspace{12pt}
+\rmfamily
+
+\begin{abstract}
+Clinical AI systems are beginning to move beyond advice toward multi-step action in scheduling,
+referral management, documentation, and care coordination. When such systems operate concurrently,
+harms may arise not only from an individual agent's output but from interactions across shared
+patients, workflows, data, and finite resources. Existing healthcare standards and general-purpose
+agent protocols provide important foundations for data exchange, authorization, tool access, and
+message transport, yet they do not consistently specify how autonomous clinical actors should expose
+intent, honor cross-workflow dependencies, coordinate contested resources, or enter a safe mode when
+coordination fails. We introduce CIRC, Clinical Infrastructure for Reliable Coordination, a conceptual
+governance framework intended to support requirements analysis and stimulate protocol design, not a
+proposed standard or validated architecture. CIRC organizes a non-exhaustive taxonomy of agent-local,
+interaction-and-workflow, and system-and-institutional risks, and maps them to independent governance
+levers for identity and attribution, scope and authorization, structured intent and shared state,
+dependency coordination, resource awareness, operational human oversight, and monitoring and failure
+containment. Deployments may require different combinations of these levers; they do not form a
+cumulative maturity sequence. We use CliniCARE-Bench as a worked example of how trace-observable
+agent-local risks can be evaluated without inspecting private model reasoning, while identifying
+multi-agent interaction and institutional risks that current benchmarks do not test. CIRC therefore
+offers a starting vocabulary for connecting clinical-agent risks, controls, and evidence requirements
+before deployment.
+\end{abstract}
+\vspace{13pt}
+\hrule height 0.45pt
+\vspace{14pt}
+\end{minipage}
+]
+
+\section{Introduction}
+
+Clinical artificial intelligence (AI) is shifting from decision support toward systems that can select
+and execute multiple steps in clinical or administrative workflows.\cite{moritz2025coordinated,
+borkowski2025multiagent,taylor2025agents} In this Perspective, a \emph{clinical agent} is a software
+system that can pursue a delegated objective by choosing and performing workflow actions with less
+immediate human initiation than conventional decision support. This definition includes
+administrative agents, supervised clinical agents, and agents permitted to initiate clinically
+consequential changes; these categories carry different risks and should not be governed identically.
+
+Healthcare's dominant standards, including FHIR, SMART on FHIR, and CDS Hooks, were designed for data
+exchange, application authorization, and workflow-triggered decision support.\cite{hl7fhir2019,
+hl7cdshooks2018,mandel2016smart} These capabilities remain essential and can support portions of
+agentic workflows through profiles, implementation guides, workflow engines, and local extensions.
+The governance question is narrower: which additional conventions may be needed when software actors
+operate continuously, initiate actions, and interact across organizational and vendor boundaries?
+
+Potential failures include stale shared state, actions executed before prerequisites are satisfied,
+incompatible changes by different agents, retry loops, resource congestion, and escalations with no
+accountable recipient. We call harms arising from such dependencies \emph{interaction risks}. The
+term does not imply that every multi-agent failure requires a new protocol: centralized orchestration,
+EHR-native workflow controls, policy engines, and human-led processes may implement some or all of the
+needed safeguards.
+
+Single-agent evaluation remains necessary but may be insufficient for systems whose actions interact.
+Evaluation must distinguish errors in an agent's own investigation from failures created by shared
+state, dependencies, handoffs, resource competition, or institutional response. This distinction
+motivates a taxonomy that links each risk to observable evidence and candidate controls rather than
+placing deployments on a single ladder.
+
+We introduce CIRC, Clinical Infrastructure for Reliable Coordination, as a conceptual governance
+framework intended to stimulate protocol design rather than a proposed standard, implemented
+architecture, or certification scheme. CIRC makes three contributions. First, it offers a
+non-exhaustive starting taxonomy spanning agent-local, interaction-and-workflow, and
+system-and-institutional risks. Second, it defines independent governance levers that institutions can
+select according to a deployment's autonomy, clinical consequences, and organizational setting.
+Third, it connects those risks and controls to evaluation evidence, using an existing trace-based
+clinical benchmark as a concrete example while making explicit which multi-agent risks remain
+untested. The levers are neither claimed to be minimal nor sufficient, and future extensions are
+expected.
+
+\section{Existing infrastructure: capabilities and remaining gaps}
+
+Healthcare has invested decades in interoperability infrastructure, including HL7v2 for clinical
+messaging, FHIR for structured data and workflow resources, SMART on FHIR for application
+authorization, and CDS Hooks for workflow-triggered decision support.\cite{hl7v251,hl7fhir2019,
+mandel2016smart,hl7cdshooks2018,hl7smart2024} These standards already provide more of the substrate
+for agentic workflows than a simple ``data exchange'' characterization suggests. FHIR Provenance and
+AuditEvent can record actors, activities, policies, and outcomes. FHIR Task represents work state,
+owners, inputs, outputs, composite tasks, and links to formal workflow definitions; the specification
+explicitly accommodates both distributed task management and central workflow engines. Subscription
+supports event notification. SMART Backend Services authorizes headless applications, and CDS Hooks
+invokes services at defined clinical workflow events.
+
+The broader AI ecosystem also provides substantial coordination machinery. A2A defines agent cards,
+signed capability descriptions, stateful tasks, task cancellation, streaming and push updates,
+authorization states, extensions, and security guidance.\cite{googlea2a2025,a2aspec2026} MCP defines
+a host-controlled architecture for connecting models to isolated tool and resource servers, with
+capability negotiation and host-enforced security boundaries.\cite{anthropicmcp2024,mcpspec2025}
+ACP-style protocols similarly support task and message exchange.\cite{ibmacp2025} The open question
+is therefore not whether these technologies can participate in clinical coordination. It is which
+healthcare-specific semantics and conformance expectations should be shared across implementations.
+
+Table~\ref{tab:standards} distinguishes capabilities already present from capabilities that are
+representable through profiles, extensions, or local infrastructure, and from governance contracts
+that are not yet consistently standardized. The boundary is not absolute. A health system can
+implement many CIRC levers today without waiting for a new standard; CIRC's proposed contribution is
+to connect those implementation choices to explicit risk and evidence requirements.
+
+\begin{table}[htbp]
+\centering
+\caption{Existing infrastructure and the narrower coordination questions raised by CIRC.}
+\label{tab:standards}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.16\linewidth}YY}
+\toprule
+Standard or approach & Capabilities already provided & Extension or governance work for clinical-agent use \\
+\midrule
+FHIR resources & Structured clinical data; Task lifecycle, ownership, inputs, outputs, and composite
+work; Provenance and AuditEvent; event subscriptions. & \textbf{Semantics and conformance:} profiles
+can encode agent versions, dependencies, and state, but common clinical-agent profiles, required
+fields, and cross-vendor behavior would need agreement. \\
+SMART on FHIR & OAuth-based authorization for user-facing and headless clients; patient and encounter
+context; resource-level scopes and token introspection. & \textbf{Authorization policy:} local
+policy can restrict actions, but patient-specific authority, degree of autonomy, approval conditions,
+and revocation across agents require explicit policy and enforcement. \\
+CDS Hooks & Synchronous invocation at named clinical workflow events; context and prefetch; cards,
+suggestions, and SMART app launch. & \textbf{Workflow:} useful for human-mediated checkpoints, but
+not a durable multi-agent dependency graph, transaction protocol, or population resource controller. \\
+A2A and ACP-style protocols & Agent discovery, capability advertisement, messages, stateful tasks,
+status updates, cancellation, authentication patterns, and extensions. & \textbf{Clinical
+governance:} healthcare intent, patient and encounter binding, action authority, clinical
+prerequisites, accountable escalation, and safe-mode semantics require domain profiles or local rules. \\
+MCP & Host-mediated access to tools, resources, and prompts; capability negotiation; isolation of
+server connections; host control of permissions and consent. & \textbf{Scope:} MCP can expose
+governed clinical tools, but it is not a peer-agent workflow or shared clinical dependency standard. \\
+Workflow and policy engines & Stateful orchestration, business rules, human tasks, access decisions,
+retries, timeouts, and compensation within a governed deployment. & \textbf{Implementation and
+portability:} these may implement CIRC levers locally; cross-vendor semantics, evidence exchange, and
+institutional trust remain deployment-specific unless profiled. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Existing AI risk frameworks characterize what can go wrong. The AI Risk Repository synthesizes more
+than 700 risks across 43 taxonomies, and the NIST AI Risk Management Framework organizes governance
+functions for trustworthy systems.\cite{slattery2024risk,nist2023airmf} Clinical agent benchmarks
+evaluate whether individual agents perform correctly in realistic environments.\cite{jiang2025medagentbench,
+ferber2025oncology} Multi-agent clinical deployment additionally raises questions about interacting
+agents acting concurrently on shared patients, finite resources, and institutional workflows. Four
+gaps illustrate this distinction.
+
+\subsection*{Inconsistent agent observability and attribution}
+
+As agents move from recommending actions to initiating orders, updating documentation, routing
+referrals, or modifying schedules, audit infrastructure should distinguish human-authored actions,
+human-approved agent actions, and autonomous agent-initiated actions. FHIR Provenance and AuditEvent
+can represent software actors, activities, policies, outcomes, and signatures. The remaining issue is
+implementation consistency: deployments would need profiles and policies requiring stable agent and
+model versions, delegation context, and links between the clinical action and its audit record.
+Without that consistency, adverse-event review may still struggle to reconstruct which agent acted,
+under whose authority, and within which scope.
+
+\subsection*{Unstandardized clinical intent and dependency semantics}
+
+Clinical coordination requires expressing dependencies across disease-focused, patient-focused,
+capability-focused, and operational agents. FHIR Task, RequestGroup, CarePlan, and workflow
+definitions can represent much of this structure, while A2A tasks and extensions can carry it across
+agents. The gap is a shared clinical profile specifying which prerequisites, timing windows, state
+versions, resource needs, escalation rules, and reversal obligations must be declared for a given
+class of autonomous action. Such a profile could extend existing standards rather than replace them.
+
+\subsection*{Authorization without a shared model of clinical autonomy}
+
+Healthcare defines role-based authority around expertise, licensure, institutional policy, and
+accountability. SMART scopes and A2A authorization mechanisms can authenticate applications, limit
+data access, and require additional authorization. Their policies are intentionally implementation
+specific. A clinical deployment still must define whether an agent may read, recommend, draft, place,
+or execute an action; for which patients and settings; and with which approval and escalation path.
+CIRC calls for these distinctions to be machine-readable and auditable, not for a replacement of
+OAuth, SMART, or institutional access-control systems.
+
+\subsection*{Locally implemented system-level resource coordination}
+
+When many agents independently conclude that the same time window is optimal for imaging, infusion,
+discharge planning, or specialist review, they could collectively overwhelm shared resources even if
+each decision is locally reasonable. Prior work calls this type of convergence a ``digital
+stampede.''\cite{chopra2025ripple} Historical utilization statistics and single-agent benchmarks may
+not expose risks arising dynamically from the interaction of agents, patients, resources, and
+workflows. Existing standards can represent many relevant facts, and workflow engines can coordinate
+specified processes, but aggregate demand signals and population-level stress tests are not routinely
+portable across clinical agent ecosystems. This is chiefly an implementation and governance gap:
+institutions may reasonably keep resource arbitration centralized rather than expose it through a
+peer-to-peer protocol.
+
+The Ripple Effect Protocol (REP) motivates this population-level failure pattern but is not evidence
+that CIRC is effective in healthcare. REP exchanges sensitivity signals among agents and reports
+results from nonclinical simulated domains; CIRC neither requires that mechanism nor assumes those
+results transfer to clinical operations. Aggregate demand or sensitivity signals are one candidate
+implementation of resource awareness, and would require separate evaluation of privacy, manipulation,
+allocation fairness, workflow effects, and clinical safety.
+
+\section{A non-exhaustive taxonomy of clinical-agent risk}
+
+CIRC begins with risks rather than levels. The taxonomy is intentionally non-exhaustive: it is a
+starting point for requirements analysis, not a claim to enumerate every hazard or rank deployments
+on a maturity scale. We organize risks by the locus at which evidence and control are needed
+(Table~\ref{tab:risk-taxonomy}). A single event can occupy more than one domain, and risk domains do
+not imply causal independence.
+
+\begin{table}[htbp]
+\centering
+\caption{A non-exhaustive taxonomy of clinical-agent risks.}
+\label{tab:risk-taxonomy}
+\small
+\begin{tabularx}{\linewidth}{B{0.20\linewidth}YY}
+\toprule
+Risk domain & Illustrative risks & Primary unit of evaluation \\
+\midrule
+Agent-local evidence and reasoning & Wrong-patient or wrong-episode attribution; temporal
+misalignment; substitution of codes or orders for clinical evidence; incomplete evidence retrieval;
+rule misapplication; unsupported inference; false closure under missing or conflicting evidence. &
+One agent's observable investigation, actions, report, and abstention behavior. \\
+Interaction and workflow & Stale or inconsistent shared state; unmet prerequisites; incompatible or
+duplicated actions; failed handoffs; race conditions; incorrect dependency graphs; recursive retry or
+negotiation loops. & Concurrent trajectories around a shared patient, task, or care pathway. \\
+System and institutional & Resource congestion; correlated failure across patients; unavailable or
+misleading aggregate signals; escalation without an accountable responder; coordination-layer
+outage; cross-organizational trust failure; alert burden, inequity, and drift. & Agent populations,
+shared resources, institutions, and human response processes over time. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The first domain is already visible in emerging clinical-agent evaluations. CliniCARE-Bench, for
+example, evaluates retrospective clinical audits over 25 scenarios and 750 patient-specific cases in
+a governed, replayable EHR environment.\cite{chatrath2026clinicare} It separately scores final
+verdicts, patient-evidence grounding, policy use, process adherence, and calibrated abstention. Across
+16 evaluated systems, reported four-way accuracy ranged from 65.3\% to 76.1\%, while accuracy that
+also excluded prohibited process shortcuts was 4.8 to 14.8 percentage points lower. Every evaluated
+system over-committed more often than it over-abstained. These findings do not validate CIRC and do
+not test multi-agent coordination. They demonstrate something narrower and useful: governance-relevant
+properties can be specified against observable traces, and a correct output can conceal a defective
+investigation.
+
+Interaction and system risks require different evidence. A benchmark in which one agent reviews one
+record cannot measure cross-agent deadlock, conflicting modifications, population-level demand, or
+whether a clinician responds to an escalation. These risks require multi-agent replay, workflow stress
+tests, sociotechnical simulation, prospective shadow deployment, or post-deployment monitoring. CIRC
+uses the taxonomy to make those evidence boundaries explicit rather than treating single-agent
+accuracy as a proxy for system safety.
+
+\section{CIRC governance levers}
+
+CIRC maps risks to independent governance levers (Table~\ref{tab:levers}). A lever is a capability or
+institutional control that can be implemented through a protocol, a centralized service, an EHR-native
+workflow, or another architecture. Deployments may implement the levers in different orders and at
+different strengths. None is asserted to be individually necessary, collectively sufficient, or
+unique to CIRC.
+
+\begin{table}[htbp]
+\centering
+\caption{Independent CIRC governance levers and the questions they make answerable.}
+\label{tab:levers}
+\small
+\begin{tabularx}{\linewidth}{B{0.22\linewidth}YY}
+\toprule
+Governance lever & Core question & Illustrative evidence \\
+\midrule
+Identity and attribution & Which agent and version acted, under whose authority, and in which
+execution context? & Signed identity, delegation chain, provenance record, immutable audit event. \\
+Scope and authorization & Was this action permitted for this patient, task, setting, and degree of
+autonomy? & Machine-readable capability and scope declaration; policy decision and override record. \\
+Structured intent and shared state & What action is proposed, against which state version, with what
+time limit and reversal plan? & Typed intent message, state version, expected effect, expiry, and
+idempotency key. \\
+Dependency coordination & Which prerequisites and downstream obligations must hold before and after
+the action? & Dependency graph, prerequisite checks, acknowledgement, cancellation propagation. \\
+Resource and population awareness & Could locally reasonable actions create congestion or correlated
+failure? & Privacy-preserving capacity, queue, demand, priority, and concentration signals. \\
+Operational human oversight & Who must respond, by when, with what authority, and what happens after
+non-response? & Named role, response deadline, fallback recipient, override, suspension, and closure. \\
+Monitoring and failure containment & How are faults detected, bounded, revoked, and handled during
+degraded operation? & Health state, replay protection, rate limits, circuit breakers, safe mode, and
+recovery log. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The mapping is many-to-many. Dependency coordination can mitigate both agent-local omissions and
+cross-agent prerequisite violations. Identity supports auditability but does not, by itself, prevent
+an authorized agent from acting on stale state. Human oversight can contain uncertainty or conflict
+only when escalation has an accountable recipient, response window, and fallback behavior. Resource
+signals may reduce congestion while introducing privacy, manipulation, and allocation risks of their
+own.
+
+\begin{figure}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{0.97\linewidth}{C{0.22\linewidth}YB{0.25\linewidth}}
+\toprule
+Risk locus & Governance task & Candidate levers \\
+\midrule
+Agent-local & Establish whether evidence, timing, policy, scope, and uncertainty support an action. &
+Identity; scope; structured state; oversight \\
+Interaction and workflow & Preserve shared state and dependencies as actions cross agents and
+systems. & Structured intent; dependency coordination; containment \\
+System and institutional & Detect correlated demand and maintain accountability during escalation
+or outage. & Resource awareness; oversight; monitoring and containment \\
+\bottomrule
+\end{tabularx}
+\caption{CIRC connects risk loci to governance tasks and candidate controls. Arrows are intentionally
+not one-to-one: controls overlap, and the appropriate implementation depends on the deployment.}
+\label{fig:risk-control-map}
+\end{figure}
+
+This framing is compatible with multiple architectures. A central workflow engine may maintain the
+dependency graph; an institutional policy engine may enforce scope; an EHR-native service may mediate
+orders; a supervisory agent may detect conflict; and direct agent-to-agent messages may carry intent
+across vendors. Protocol-level fields are most useful where information must cross those boundaries,
+but CIRC does not assume that every control belongs in a new protocol or that decentralized agent
+communication is preferable to orchestration.
+
+\subsection{Operational definitions and a coordination message}
+
+The framework becomes testable only when its terms can be recognized in system behavior. We use the
+following operational definitions. An \emph{interaction risk} is a potential or realized failure
+attributable to interdependence among multiple actors, actions, shared state, or resources rather than
+to one output considered in isolation. A \emph{collision} occurs when two or more actions target the
+same state or resource during overlapping validity windows and violate a declared compatibility rule.
+A \emph{scope violation} is an attempted or executed action outside the authorization valid for the
+actor, patient, task, setting, time, and delegated purpose at the decision point. A \emph{dependency
+violation} occurs when an action passes its release gate while a declared prerequisite is absent,
+failed, expired, or based on an incompatible state version. \emph{Failure containment} means that a
+detected fault is held, quarantined, compensated, or reversed before it crosses a predefined patient,
+workflow, resource, or institutional boundary.
+
+Listing~\ref{lst:intent-message} gives one concrete coordination message for an imaging-scheduling
+agent proposing to move an appointment. The example is illustrative rather than a normative CIRC
+wire format. The same fields could be represented through a FHIR profile, an A2A extension, or an
+institutional workflow schema. Patient and encounter references are placeholders, not clinical data.
+
+\begin{lstlisting}[style=circjson,caption={Illustrative structured coordination message.},label={lst:intent-message}]
+{
+  "schema": "circ.intent.v0",
+  "message_id": "urn:uuid:example-message",
+  "idempotency_key": "schedule-change-example-1",
+  "actor": {
+    "agent_id": "agent:scheduling:example",
+    "version": "3.2.1",
+    "issuer": "Organization/institution-a"
+  },
+  "authority": {
+    "action": "schedule.modify",
+    "delegated_by": "PractitionerRole/care-team",
+    "policy": "Policy/outpatient-scheduling-v4"
+  },
+  "subject": {
+    "patient": "Patient/example",
+    "encounter": "Encounter/example"
+  },
+  "state": {
+    "version": "W/example-etag",
+    "observed_at": "2030-01-15T14:30:00Z"
+  },
+  "intent": {
+    "proposed_action": "reschedule imaging",
+    "target": "Task/imaging-example",
+    "reason": "capacity adjustment"
+  },
+  "dependencies": [
+    {"task": "Task/oncology-clearance", "required_state": "completed"},
+    {"task": "Task/observation-visit", "constraint": "must_remain_scheduled"}
+  ],
+  "valid_until": "2030-01-15T15:00:00Z",
+  "reversal": {"action": "restore_prior_slot", "deadline_minutes": 30},
+  "escalation": {
+    "owner_role": "oncology attending",
+    "respond_by": "2030-01-15T14:50:00Z",
+    "on_timeout": "hold"
+  },
+  "signature": "detached-jws:example"
+}
+\end{lstlisting}
+
+The receiver can evaluate this proposal without inferring critical context from free text: it can
+authenticate the actor, evaluate action-specific authority, compare state versions, inspect
+prerequisites, deduplicate retries, enforce expiry, and route unresolved conflict to an accountable
+role. A valid message does not imply a valid clinical decision; it makes the decision context
+inspectable and enforceable.
+
+\subsection{One possible deployment architecture}
+
+Figure~\ref{fig:architecture} shows one centralized realization of the levers. Agents communicate
+through a coordination service or workflow engine, which checks institutional identity and policy,
+binds actions to EHR state, appends audit evidence, and routes escalations to a named human queue. An
+external agent crosses an institutional boundary with a signed, scoped intent message and remains
+subject to local policy. The diagram is not a required topology: the same interfaces may be
+distributed, embedded in the EHR, or divided among existing services.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.98\linewidth}{!}{\input{../figures/circ_architecture.tex}}
+\caption{One possible implementation of CIRC governance levers. Identity, authorization, clinical
+state, audit, and human escalation remain institutionally governed even when an external agent uses a
+shared coordination message. The coordination service may be replaced by an EHR-native workflow or
+another architecture that provides equivalent controls and evidence.}
+\label{fig:architecture}
+\end{figure}
+
+\subsection{Implementation patterns and trade-offs}
+
+The same governance lever can be realized through different architectures
+(Table~\ref{tab:architectures}). The appropriate choice depends on institutional boundaries,
+workflow stability, latency, reversibility, and the consequences of coordinator failure.
+
+\begin{table}[htbp]
+\centering
+\caption{Alternative architectures for implementing CIRC governance levers.}
+\label{tab:architectures}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.19\linewidth}YY}
+\toprule
+Pattern & Principal strengths & Limitations and role of shared conventions \\
+\midrule
+Central workflow orchestrator & One authority for sequencing, retries, compensation, and human
+tasks; clear operational ownership. & Can become a bottleneck or single failure domain; cross-vendor
+inputs still need stable identity, intent, state, and outcome semantics. \\
+EHR-native workflow control & Close to orders, patient context, existing permissions, and clinician
+work queues. & May be vendor- or institution-specific and difficult to extend across external agents
+or non-EHR systems. \\
+Policy engine and identity layer & Centralized authorization, revocation, separation of duties, and
+consistent policy decisions. & Does not by itself coordinate task state, clinical prerequisites,
+resource contention, or human response. \\
+Supervisory agent & Can synthesize context and detect conflicts without requiring every peer to
+communicate directly. & Introduces another model failure surface; requires bounded authority,
+independent monitoring, and deterministic enforcement for consequential actions. \\
+Distributed agent protocol & Supports cross-vendor discovery, delegation, and task exchange without
+one workflow owner. & Increases consistency, trust, conflict-resolution, and outage-recovery demands;
+clinical profiles are needed above the transport. \\
+Human-led coordination & Uses existing professional accountability and adapts to unusual cases. &
+Limited by latency, workload, alert burden, and diffusion of responsibility; agent escalations still
+need named recipients and closure rules. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+CIRC is therefore best understood as an architecture-neutral requirements framework. It asks whether
+the chosen design can provide each needed control and its evidence trail. A FHIR implementation guide,
+an A2A clinical extension, or a local orchestration policy could each satisfy portions of that
+contract. A new protocol primitive is warranted only where existing representations cannot express a
+required concept or where cross-system conformance cannot otherwise be achieved.
+
+\section{Failure model and degraded operation}
+
+A coordination layer is itself safety-critical infrastructure and can create common-mode failure.
+CIRC therefore assumes that agents, credentials, messages, state stores, dependency models,
+coordinators, and human response processes can each fail or be compromised. It does not assume that
+failures are independent or benign. The framework does not prescribe a universal identity issuer or
+consistency algorithm; it requires each deployment to declare its trust anchors, revocation mechanism,
+state guarantees, and degraded behavior. This follows a zero-trust posture in which access is
+evaluated for the requesting subject, resource, and context rather than inferred from network
+location.\cite{rose2020zerotrust}
+
+Table~\ref{tab:failure-model} states the principal failure surfaces. The controls are illustrative:
+their adequacy depends on clinical consequences, timing, reversibility, and organizational boundaries.
+Classical state-machine replication can improve availability and consistency, for example, but does
+not make an incorrect dependency model clinically correct.\cite{schneider1990statemachine}
+
+\begin{table}[htbp]
+\centering
+\caption{Failure model for the clinical-agent coordination layer.}
+\label{tab:failure-model}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.19\linewidth}YY}
+\toprule
+Failure surface & Illustrative failures & Required containment behavior \\
+\midrule
+Identity and trust & Compromised agent; false scope declaration; credential theft; stale or
+unrevoked credential; untrusted external issuer. & Verify issuer, audience, version, delegation, and
+revocation at decision time; reject or quarantine the actor; preserve evidence for incident review. \\
+State and messaging & Stale patient state; loss, duplication, reordering, or replay; conflicting
+versions; delayed acknowledgement; network partition. & Bind actions to state versions; use
+idempotency and replay protection; expose uncertainty; prevent irreversible execution on unresolved
+state. \\
+Dependency and workflow & Missing or incorrect prerequisite; cyclic dependency; deadlock or
+livelock; unbounded retry; partial cancellation or compensation. & Validate graphs, bound retries,
+detect cycles, propagate cancellation, and freeze the affected pathway when consistency cannot be
+restored. \\
+Arbitration and resource signals & Incorrect priority; manipulated or stale capacity; starvation;
+correlated demand; denial of service. & Authenticate and timestamp aggregate signals, enforce rate
+and fairness policies, detect concentration, and transfer allocation to a designated fallback. \\
+Coordination service & Outage, corrupted state, faulty arbitration, software update failure, or loss
+of quorum. & Use health checks and redundancy appropriate to risk; expose degraded status; restore
+from auditable checkpoints; avoid silent continuation under unknown control state. \\
+Human control path & Alert not delivered or acknowledged; wrong recipient; alert overload;
+automation bias; conflicting overrides; diffusion of responsibility. & Require named ownership,
+deadline and acknowledgement, fallback escalation, override authority, workload monitoring, and
+documented closure. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Safe mode should be defined by action class rather than by one universal ``fail closed'' rule.
+Read-only retrieval or analysis may continue during partial outage only when data freshness and
+missing coordination context are visible to the user. Reversible administrative actions may be
+queued, deduplicated, or released after explicit confirmation. Actions that change treatment, orders,
+medication, disposition, or other consequential clinical state should generally be held when identity,
+scope, prerequisite, or shared-state checks are unavailable. Emergency exceptions require a
+predefined institutional pathway; the coordination layer should not invent one at runtime. In every
+case, the system should identify which guarantees remain active, return control to a named role, and
+record how normal operation was restored.
+
+Cross-organizational identity requires federation rather than one global CIRC authority. Each
+institution can issue or recognize credentials under its own policy, while bilateral or network trust
+agreements define accepted issuers, assurance levels, claims, and revocation expectations. A valid
+identity establishes attribution, not clinical authority: authorization remains specific to the
+patient, action, setting, time, and delegated purpose.
+
+\section{Operational human oversight}
+
+``Human review'' is not a control unless it changes who is responsible for what happens next. Health
+IT safety is sociotechnical: performance depends on people, tasks, technology, organizations, and the
+environment in which they interact.\cite{sittig2010sociotechnical,carayon2006seips} Automation can
+also redistribute attention and authority rather than simply reduce workload.\cite{parasuraman2000automation}
+CIRC therefore treats oversight as an operational contract, not an endpoint label.
+
+Every escalation should specify: (1) the accountable role and current assignee; (2) the triggering
+condition and supporting evidence; (3) the decision or action requested; (4) urgency and a response
+deadline; (5) whether the proposed action is blocked, queued, or continuing; (6) the fallback recipient
+and behavior after non-response; and (7) the event that closes the escalation. Assignment, delivery,
+acknowledgement, decision, override, and closure should be distinct auditable states.
+
+Institutions must also define governance outside the immediate alert. A designated body should
+approve agent scopes and material changes; operational owners should be able to pause an agent;
+credential and policy administrators should revoke access; and a clinical authority should resolve
+conflicting recommendations. Separation of duties is important when one vendor supplies both the
+acting agent and the supervisory component. Escalation policies should suppress duplicates, group
+related concerns, set alert budgets, and monitor acknowledgement and override patterns so that adding
+a coordination layer does not simply add another source of alert fatigue.
+
+Useful oversight measures include time to assignment, acknowledgement, and decision; fraction of
+escalations with no response by deadline; fallback activation; duplicate-alert rate; override and
+reversal rate; unresolved workload per accountable role; and the fraction of consequential actions
+executed without documented closure. These measures evaluate the response process rather than merely
+counting alerts.
+
+\section{Regulatory and institutional positioning}
+
+Regulatory status attaches to a software function, its intended use, users, claims, and deployment
+context---not to the labels ``agent'' or ``CIRC'' and not to a centralized or distributed topology.
+In the United States, FDA guidance distinguishes clinical decision support functions that satisfy the
+statutory non-device criteria from software functions that remain devices.\cite{fda2026cds} A
+multi-agent deployment may contain administrative functions, non-device decision support, and device
+software functions at the same time. Each function therefore requires its own assessment, including
+whether combining it with autonomous execution or other agents changes its intended use or risk.
+
+For an AI-enabled device software function, an authorized predetermined change control plan can
+describe specified future modifications, the method for developing, validating, and implementing
+them, and the associated impact assessment.\cite{fda2025pccp} CIRC records such as stable versions,
+delegation, policy decisions, dependency checks, reversals, and post-deployment events could support
+that lifecycle evidence. They do not establish safety or effectiveness, expand the authorized
+intended use, or make an out-of-plan modification permissible.
+
+The European Union AI Act likewise bases obligations on intended purpose, statutory role, and
+classification. For systems classified as high-risk, its requirements include risk management,
+record keeping, human oversight, accuracy, robustness, cybersecurity, quality management, and
+post-market monitoring, with different duties for providers and deployers.\cite{eu2024aiact} CIRC
+levers overlap with several of these operational concerns, but implementing a lever is not itself a
+demonstration of conformity. Privacy, cybersecurity, medical-device, professional-practice, and
+health-system obligations also remain independently applicable.
+
+\begin{table}[htbp]
+\centering
+\caption{Boundary between CIRC evidence and regulatory or institutional decisions.}
+\label{tab:regulatory-boundary}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.19\linewidth}YY}
+\toprule
+Decision layer & Question that must be answered & Role of CIRC \\
+\midrule
+Classification & What is each function's intended use, and which legal category and actor roles
+apply? & Can inventory functions, autonomy, actions, and responsible organizations; does not assign
+legal status. \\
+Premarket or conformity assessment & Is there adequate evidence of safety, performance, and clinical
+benefit for the intended use? & Can expose control operation and trace provenance; does not replace
+analytical, clinical, usability, or system validation. \\
+Institutional deployment & Who may activate, authorize, monitor, pause, and respond to the system in
+this workflow? & Can encode local scope, accountability, escalation, and safe mode; does not transfer
+professional or organizational responsibility. \\
+Change and post-market control & Which modifications are allowed, what requires reassessment, and how
+are emerging risks detected? & Can bind versions to impact assessments and monitoring evidence; does
+not authorize a modification or define the reporting threshold. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\FloatBarrier
+
+Before release, a deployment dossier should therefore map every consequential action to the function
+that proposes and executes it, its intended use and autonomy, the responsible legal and operational
+actors, applicable authorization, validation evidence, dependencies, affected populations, and
+fallback behavior. Changes to a model or agent version, permitted action, dependency, trust boundary,
+patient population, resource policy, or human fallback should trigger a recorded impact assessment
+proportional to the risk. This is an institutional change-control rule, not a claim that every change
+requires a new regulatory submission.
+
+\section{From risk taxonomy to evaluation}
+
+The taxonomy separates three questions that were conflated in the submitted simulations. First, can
+a risk be observed? Candidate measures include attribution completeness, stale-state reads,
+unresolved dependencies, duplicated or conflicting actions, retry amplification, queue concentration,
+safe-mode activation, and unowned or overdue escalations. Second, can a control detect or contain the risk without blocking valid work?
+Matched stress tests should report both fault containment and preservation of unaffected workflows.
+Third, does the control improve clinical or operational outcomes? That question requires prospective
+evaluation and cannot be inferred from a deterministic demonstration.
+
+Trace-based benchmarks such as CliniCARE provide a concrete template for the first question. They log
+retrieval, computation, policy access, citations, and reports, allowing process defects to be separated
+from final-answer errors without inspecting private reasoning. Extending this approach to interaction
+risks would require linked traces from multiple agents acting on shared state, together with
+prespecified fault models, applicable denominators, baselines, repeated runs, uncertainty estimates,
+and failure cases. Population-level resource tests would additionally need realistic arrival
+processes, capacity constraints, and human response models.
+
+Accordingly, this Perspective does not present the removed toy simulations as evidence of control
+effectiveness. Instead, it proposes a staged evaluation agenda: trace-based assessment of agent-local
+risks; matched multi-agent replay for interaction and workflow risks; system stress testing for shared
+resources and common-mode failure; prospective shadow deployment; and monitored clinical use where
+regulatory and institutional requirements permit.
+
+\section{Limitations and future directions}
+
+CIRC is a conceptual and non-exhaustive framework. It does not specify a complete technical
+implementation, establish the necessity or sufficiency of any lever, certify deployment readiness, or
+demonstrate clinical benefit. The taxonomy will require extension as clinical agents acquire new
+capabilities and as evidence emerges from real workflows. Its categories also overlap: a stale-state
+error, for example, can reflect an agent-local retrieval failure, an interaction failure, and an
+institutional monitoring failure.
+
+CliniCARE illustrates trace-observable agent-local risks, but it is a retrospective single-agent audit
+benchmark rather than a test of multi-agent coordination. Its findings cannot support claims about
+cross-vendor messaging, shared-resource control, human response, or prevented patient harm. Likewise,
+population-level clinical prediction is outside the scope of a coordination framework and must be
+developed and validated as a separate clinical model.
+
+The threat model and oversight contract identify requirements but do not establish that any proposed
+implementation will satisfy them. Choices about trusted issuers, consistency, emergency exceptions,
+response deadlines, and safe-mode behavior remain institution- and action-specific. Governance
+questions also include liability, local configuration, alert burden, and equitable access. The
+regulatory discussion above is descriptive rather than legal guidance; applicability depends on the
+specific function, intended use, jurisdiction, and organizational role. Future work should compare
+protocol, orchestration, policy-engine, EHR-native, and human-led implementations against common
+risk-specific endpoints.
+
+\section{Conclusion}
+
+Multi-agent clinical safety cannot be inferred from individual-agent performance alone. The relevant
+risks span local investigations, interactions across shared workflows, and the institutions that
+authorize, monitor, and respond to autonomous action. CIRC offers a starting taxonomy for those risks
+and a set of independent governance levers that can be implemented through different technical
+architectures.
+
+The framework's value should be judged by whether it makes requirements and evidence more precise,
+not by treating its categories as a maturity ladder or its controls as established safety invariants.
+Existing trace-based benchmarks show how some agent-local risks can be measured. The next challenge is
+to build equally inspectable evaluations for shared state, dependencies, resource competition,
+degraded operation, and human response before autonomous clinical agents operate at scale.
+
+\section*{Funding}
+This work was accomplished without funding.
+
+\section*{Competing interests}
+The authors declare no competing interests.
+
+\nocite{*}
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}

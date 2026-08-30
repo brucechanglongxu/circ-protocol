@@ -1,4 +1,4 @@
-.PHONY: pdf clean milestone
+.PHONY: pdf clean milestone npj
 
 VERSION ?= draft
 
@@ -9,6 +9,9 @@ pdf:
 
 milestone: pdf
 	cp build/main.pdf revisions/$(VERSION).pdf
+
+npj:
+	$(MAKE) -C npj-preview pdf
 
 clean:
 	latexmk -C -outdir=build main.tex
