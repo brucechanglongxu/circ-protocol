@@ -84,3 +84,17 @@
   institutional deployment decisions, and post-market change control.
 - Added a deployment-dossier and impact-assessment rule for changes to models, actions,
   dependencies, trust boundaries, populations, resource policies, and human fallbacks.
+
+## Revision 6: reviewer closure
+
+- Added a lever-by-lever crosswalk linking existing infrastructure, residual coordination contracts,
+  gap types, implementation alternatives, and observable evidence.
+- Explained the functional derivation of the seven levers while retaining explicit limits on their
+  necessity, sufficiency, and completeness.
+- Mapped U.S. and European regulatory duties to CIRC operational records and separated those records
+  from classification, authorization, conformity, liability, and local-law decisions.
+- Removed obsolete vignette and superseded regulatory references, added workflow and systems-safety
+  literature, and cited every retained bibliography entry in the manuscript.
+- Completed a manuscript-wide claims and prose audit and synchronized the canonical and npj sources.
+- Added an accurate point-by-point response covering all three reviewers and the limits of the
+  manuscript's evidentiary claims.

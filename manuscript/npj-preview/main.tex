@@ -222,7 +222,7 @@ MCP & Host-mediated access to tools, resources, and prompts; capability negotiat
 server connections; host control of permissions and consent. & \textbf{Scope:} MCP can expose
 governed clinical tools, but it is not a peer-agent workflow or shared clinical dependency standard. \\
 Workflow and policy engines & Stateful orchestration, business rules, human tasks, access decisions,
-retries, timeouts, and compensation within a governed deployment. & \textbf{Implementation and
+retries, timeouts, and compensation within a governed deployment.\cite{omgbpmn2014} & \textbf{Implementation and
 portability:} these may implement CIRC levers locally; cross-vendor semantics, evidence exchange, and
 institutional trust remain deployment-specific unless profiled. \\
 \bottomrule
@@ -345,34 +345,52 @@ workflow, or another architecture. Deployments may implement the levers in diffe
 different strengths. None is asserted to be individually necessary, collectively sufficient, or
 unique to CIRC.
 
+We selected the seven levers by decomposing the risk taxonomy into operational questions that a
+deployment must answer: who acted, whether the action was permitted, what state and intent governed
+it, which dependencies applied, whether shared resources were affected, who assumed responsibility,
+and how failure was contained. This is a functional decomposition, not an empirical derivation or a
+closed ontology. Transport security, privacy, clinical validation, and model performance remain
+cross-cutting obligations rather than CIRC levers because they do not alone resolve coordination
+state. Future evidence may justify splitting, combining, or adding levers.
+
 \begin{table}[htbp]
 \centering
-\caption{Independent CIRC governance levers and the questions they make answerable.}
+\caption{Lever-level crosswalk from existing infrastructure to residual coordination contracts.}
 \label{tab:levers}
-\small
-\begin{tabularx}{\linewidth}{B{0.22\linewidth}YY}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.18\linewidth}p{0.24\linewidth}YY}
 \toprule
-Governance lever & Core question & Illustrative evidence \\
+Governance lever & Existing substrate & Residual contract and gap type & Illustrative evidence \\
 \midrule
-Identity and attribution & Which agent and version acted, under whose authority, and in which
-execution context? & Signed identity, delegation chain, provenance record, immutable audit event. \\
-Scope and authorization & Was this action permitted for this patient, task, setting, and degree of
-autonomy? & Machine-readable capability and scope declaration; policy decision and override record. \\
-Structured intent and shared state & What action is proposed, against which state version, with what
-time limit and reversal plan? & Typed intent message, state version, expected effect, expiry, and
-idempotency key. \\
-Dependency coordination & Which prerequisites and downstream obligations must hold before and after
-the action? & Dependency graph, prerequisite checks, acknowledgement, cancellation propagation. \\
-Resource and population awareness & Could locally reasonable actions create congestion or correlated
-failure? & Privacy-preserving capacity, queue, demand, priority, and concentration signals. \\
-Operational human oversight & Who must respond, by when, with what authority, and what happens after
-non-response? & Named role, response deadline, fallback recipient, override, suspension, and closure. \\
-Monitoring and failure containment & How are faults detected, bounded, revoked, and handled during
-degraded operation? & Health state, replay protection, rate limits, circuit breakers, safe mode, and
-recovery log. \\
+Identity and attribution & OAuth and SMART identity; A2A authentication; FHIR Provenance and
+AuditEvent. & Stable agent and model version, delegation, and action linkage across systems
+(semantics and conformance). & Signed identity, delegation chain, provenance, immutable audit event. \\
+Scope and authorization & SMART scopes; OAuth tokens; policy engines; A2A authorization states. &
+Patient-, action-, setting-, time-, and autonomy-specific authority with revocation
+(authorization and governance). & Scope declaration, policy decision, override and revocation record. \\
+Structured intent and shared state & FHIR Task and request resources; A2A tasks and messages; event
+middleware. & Required action, patient context, state version, expiry, idempotency, and reversal
+(semantics and conformance). & Typed intent, expected effect, state version, expiry, idempotency key. \\
+Dependency coordination & FHIR workflow resources; BPMN and workflow engines; task cancellation. &
+Cross-vendor prerequisite, acknowledgement, cancellation, and compensation behavior
+(workflow and portability). & Dependency graph, release checks, acknowledgement, cancellation log. \\
+Resource and population awareness & Scheduling, queueing, and capacity systems within institutions. &
+Governed demand, priority, concentration, and fairness signals where needed
+(implementation and governance). & Timestamped capacity and demand measures, allocation decision. \\
+Operational human oversight & EHR work queues; workflow human tasks; institutional escalation policy. &
+Named ownership, acknowledgement, deadline, fallback, suspension, and closure
+(governance and human factors). & Assignment, response, override, fallback, and closure timestamps. \\
+Monitoring and failure containment & Audit and observability platforms; rate limits; circuit breakers. &
+Action-class safe modes, common-mode detection, recovery authority, and evidence
+(operations and governance). & Health state, replay protection, safe-mode event, recovery log. \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+Most residual contracts in Table~\ref{tab:levers} could be implemented through a FHIR profile, an A2A
+extension, a workflow or policy engine, or local governance. An extension is sufficient when all
+participants can represent, enforce, and test the required behavior. CIRC adds a risk-to-requirement
+and evidence crosswalk; it does not establish that a new transport or peer-to-peer protocol is needed.
 
 The mapping is many-to-many. Dependency coordination can mitigate both agent-local omissions and
 cross-agent prerequisite violations. Identity supports auditability but does not, by itself, prevent
@@ -416,6 +434,7 @@ following operational definitions. An \emph{interaction risk} is a potential or 
 attributable to interdependence among multiple actors, actions, shared state, or resources rather than
 to one output considered in isolation. A \emph{collision} occurs when two or more actions target the
 same state or resource during overlapping validity windows and violate a declared compatibility rule.
+
 A \emph{scope violation} is an attempted or executed action outside the authorization valid for the
 actor, patient, task, setting, time, and delegated purpose at the decision point. A \emph{dependency
 violation} occurs when an action passes its release gate while a declared prerequisite is absent,
@@ -542,7 +561,9 @@ required concept or where cross-system conformance cannot otherwise be achieved.
 \section{Failure model and degraded operation}
 
 A coordination layer is itself safety-critical infrastructure and can create common-mode failure.
-CIRC therefore assumes that agents, credentials, messages, state stores, dependency models,
+Systems-theoretic safety work likewise treats hazards as failures of interactions and control rather
+than only failures of individual components.\cite{leveson2004new} CIRC therefore assumes that agents,
+credentials, messages, state stores, dependency models,
 coordinators, and human response processes can each fail or be compromised. It does not assume that
 failures are independent or benign. The framework does not prescribe a universal identity issuer or
 consistency algorithm; it requires each deployment to declare its trust anchors, revocation mechanism,
@@ -637,25 +658,27 @@ counting alerts.
 
 \begin{table}[!t]
 \centering
-\caption{Boundary between CIRC evidence and regulatory or institutional decisions.}
+\caption{Regulatory obligations, CIRC operational evidence, and unresolved boundaries.}
 \label{tab:regulatory-boundary}
 \footnotesize
-\begin{tabularx}{\linewidth}{B{0.19\linewidth}YY}
+\begin{tabularx}{\linewidth}{B{0.17\linewidth}p{0.23\linewidth}YY}
 \toprule
-Decision layer & Question that must be answered & Role of CIRC \\
+Context & Existing obligation or decision & CIRC operationalization & Not resolved by CIRC \\
 \midrule
-Classification & What is each function's intended use, and which legal category and actor roles
-apply? & Can inventory functions, autonomy, actions, and responsible organizations; does not assign
-legal status. \\
-Premarket or conformity assessment & Is there adequate evidence of safety, performance, and clinical
-benefit for the intended use? & Can expose control operation and trace provenance; does not replace
-analytical, clinical, usability, or system validation. \\
-Institutional deployment & Who may activate, authorize, monitor, pause, and respond to the system in
-this workflow? & Can encode local scope, accountability, escalation, and safe mode; does not transfer
-professional or organizational responsibility. \\
-Change and post-market control & Which modifications are allowed, what requires reassessment, and how
-are emerging risks detected? & Can bind versions to impact assessments and monitoring evidence; does
-not authorize a modification or define the reporting threshold. \\
+U.S. function classification & Intended use and statutory criteria determine whether a CDS function
+is a device. & Inventory each function, user, action, autonomy, and responsible organization. & Legal
+status, intended-use claims, and applicable submission pathway. \\
+FDA device lifecycle & Premarket evidence and, when authorized, a PCCP govern specified AI-enabled
+device changes. & Bind versions and modifications to validation, impact assessment, monitoring, and
+rollback evidence. & Safety or effectiveness, authorization of a change, and reporting thresholds. \\
+EU high-risk provider duties & Risk management, logs, oversight, robustness, quality management, and
+post-market monitoring (Arts. 9, 12, 14, 15, 17, 72). & Link identity, policy, dependency, escalation,
+safe-mode, and recovery records across agents. & High-risk classification, conformity assessment,
+fundamental-rights analysis, and provider liability. \\
+EU deployer and institutional duties & Human oversight, log retention, monitoring, and incident action
+apply according to role and context (Art. 26). & Name local owners, deadlines, fallback, pause
+authority, closure, and affected workflows. & Professional responsibility, staffing adequacy, local
+law, and allocation of responsibility across vendors. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -676,12 +699,18 @@ that lifecycle evidence. They do not establish safety or effectiveness, expand t
 intended use, or make an out-of-plan modification permissible.
 
 The European Union AI Act likewise bases obligations on intended purpose, statutory role, and
-classification. For systems classified as high-risk, its requirements include risk management,
-record keeping, human oversight, accuracy, robustness, cybersecurity, quality management, and
-post-market monitoring, with different duties for providers and deployers.\cite{eu2024aiact} CIRC
+classification. For systems classified as high-risk, Articles 9, 12, 14, 15, 17, and 72 address risk
+management, record keeping, human oversight, accuracy, robustness and cybersecurity, quality
+management, and post-market monitoring; Article 26 defines deployer duties.\cite{eu2024aiact} CIRC
 levers overlap with several of these operational concerns, but implementing a lever is not itself a
 demonstration of conformity. Privacy, cybersecurity, medical-device, professional-practice, and
 health-system obligations also remain independently applicable.
+
+The residual coordination gap is therefore operational rather than a claim that regulation is absent.
+High-level duties do not by themselves specify cross-agent state versions, dependency semantics,
+timeout and fallback behavior, or common evidence across vendor boundaries. CIRC offers a vocabulary
+for those interfaces while leaving classification, conformity, liability, and enforcement to the
+applicable authorities and institutions.
 
 Before release, a deployment dossier should therefore map every consequential action to the function
 that proposes and executes it, its intended use and autonomy, the responsible legal and operational
@@ -759,7 +788,6 @@ This work was accomplished without funding.
 \section*{Competing interests}
 The authors declare no competing interests.
 
-\nocite{*}
 \bibliographystyle{unsrtnat}
 \bibliography{references}
 
