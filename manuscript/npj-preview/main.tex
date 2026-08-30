@@ -635,30 +635,7 @@ counting alerts.
 
 \section{Regulatory and institutional positioning}
 
-Regulatory status attaches to a software function, its intended use, users, claims, and deployment
-context---not to the labels ``agent'' or ``CIRC'' and not to a centralized or distributed topology.
-In the United States, FDA guidance distinguishes clinical decision support functions that satisfy the
-statutory non-device criteria from software functions that remain devices.\cite{fda2026cds} A
-multi-agent deployment may contain administrative functions, non-device decision support, and device
-software functions at the same time. Each function therefore requires its own assessment, including
-whether combining it with autonomous execution or other agents changes its intended use or risk.
-
-For an AI-enabled device software function, an authorized predetermined change control plan can
-describe specified future modifications, the method for developing, validating, and implementing
-them, and the associated impact assessment.\cite{fda2025pccp} CIRC records such as stable versions,
-delegation, policy decisions, dependency checks, reversals, and post-deployment events could support
-that lifecycle evidence. They do not establish safety or effectiveness, expand the authorized
-intended use, or make an out-of-plan modification permissible.
-
-The European Union AI Act likewise bases obligations on intended purpose, statutory role, and
-classification. For systems classified as high-risk, its requirements include risk management,
-record keeping, human oversight, accuracy, robustness, cybersecurity, quality management, and
-post-market monitoring, with different duties for providers and deployers.\cite{eu2024aiact} CIRC
-levers overlap with several of these operational concerns, but implementing a lever is not itself a
-demonstration of conformity. Privacy, cybersecurity, medical-device, professional-practice, and
-health-system obligations also remain independently applicable.
-
-\begin{table}[htbp]
+\begin{table}[!t]
 \centering
 \caption{Boundary between CIRC evidence and regulatory or institutional decisions.}
 \label{tab:regulatory-boundary}
@@ -682,7 +659,29 @@ not authorize a modification or define the reporting threshold. \\
 \bottomrule
 \end{tabularx}
 \end{table}
-\FloatBarrier
+
+Regulatory status attaches to a software function, its intended use, users, claims, and deployment
+context---not to the labels ``agent'' or ``CIRC'' and not to a centralized or distributed topology.
+In the United States, FDA guidance distinguishes clinical decision support functions that satisfy the
+statutory non-device criteria from software functions that remain devices.\cite{fda2026cds} A
+multi-agent deployment may contain administrative functions, non-device decision support, and device
+software functions at the same time. Each function therefore requires its own assessment, including
+whether combining it with autonomous execution or other agents changes its intended use or risk.
+
+For an AI-enabled device software function, an authorized predetermined change control plan can
+describe specified future modifications, the method for developing, validating, and implementing
+them, and the associated impact assessment.\cite{fda2025pccp} CIRC records such as stable versions,
+delegation, policy decisions, dependency checks, reversals, and post-deployment events could support
+that lifecycle evidence. They do not establish safety or effectiveness, expand the authorized
+intended use, or make an out-of-plan modification permissible.
+
+The European Union AI Act likewise bases obligations on intended purpose, statutory role, and
+classification. For systems classified as high-risk, its requirements include risk management,
+record keeping, human oversight, accuracy, robustness, cybersecurity, quality management, and
+post-market monitoring, with different duties for providers and deployers.\cite{eu2024aiact} CIRC
+levers overlap with several of these operational concerns, but implementing a lever is not itself a
+demonstration of conformity. Privacy, cybersecurity, medical-device, professional-practice, and
+health-system obligations also remain independently applicable.
 
 Before release, a deployment dossier should therefore map every consequential action to the function
 that proposes and executes it, its intended use and autonomy, the responsible legal and operational
