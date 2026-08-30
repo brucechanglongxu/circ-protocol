@@ -108,5 +108,7 @@
 - Added the corresponding-author email, acknowledgments, and an author-approved contribution
   statement for all three authors.
 - Added editable and PDF cover-letter and point-by-point response documents.
+- Reformatted the point-by-point response as a plain three-page letter with shorter, section-specific
+  replies.
 - Added a reproducible submission-package target containing the presentable manuscript PDF, editable
   source and dependencies, editorial documents, and upload checklist.
