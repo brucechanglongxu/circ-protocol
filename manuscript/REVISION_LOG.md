@@ -98,3 +98,15 @@
 - Completed a manuscript-wide claims and prose audit and synchronized the canonical and npj sources.
 - Added an accurate point-by-point response covering all three reviewers and the limits of the
   manuscript's evidentiary claims.
+
+## Revision 7: npj Digital Medicine resubmission package
+
+- Replaced the title with a seven-word literal title without punctuation and reduced the abstract to
+  69 words.
+- Reduced the main prose to 2,961 words while preserving the reviewer-driven standards, architecture,
+  failure, oversight, regulatory, and evidence content.
+- Added the corresponding-author email, acknowledgments, and an author-approved contribution
+  statement for all three authors.
+- Added editable and PDF cover-letter and point-by-point response documents.
+- Added a reproducible submission-package target containing the presentable manuscript PDF, editable
+  source and dependencies, editorial documents, and upload checklist.
