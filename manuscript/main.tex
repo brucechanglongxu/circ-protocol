@@ -1,0 +1,359 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=0.85in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{circteal}{HTML}{176B87}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\placeholderfigure}[1]{%
+  \fbox{\parbox[c][1.55in][c]{0.94\linewidth}{\centering\small\color{gray}%
+  Original image unavailable in supplied manuscript text.\\[0.4em]#1}}}
+
+\title{\textbf{Coordination Before Collision: Protocol-Level Governance for Multi-Agent Clinical AI}}
+\author{%
+Bruce Changlong Xu$^{1}$, Ayush Chopra$^{2,3}$, Alexander J. Ryu$^{4}$\\[0.5em]
+\small $^{1}$Stanford University, Palo Alto, California, USA\\
+\small $^{2}$Massachusetts Institute of Technology, Cambridge, Massachusetts, USA\\
+\small $^{3}$Project Iceberg at MIT, Cambridge, Massachusetts, USA\\
+\small $^{4}$Mayo Clinic, Rochester, Minnesota, USA\\[0.5em]
+\small Correspondence: Alexander J. Ryu}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Autonomous AI agents are beginning to enter clinical workflows, helping to schedule appointments,
+manage medication regimens, and route referrals. Yet healthcare interoperability infrastructure was
+designed primarily for episodic, human-initiated data exchange rather than continuous coordination
+among autonomous actors. This architectural mismatch creates interaction risks: harms that may emerge
+when agents optimize independently across shared patients, workflows, and clinical resources. Because
+this class of risk arises from agent interaction rather than individual agent behavior alone, it cannot
+be fully assessed through single-agent evaluation and may also require population-level evaluation.
+Existing healthcare standards, including FHIR, SMART on FHIR, and CDS Hooks, and general-purpose agent
+protocols, including A2A, MCP, and ACP, provide foundations for data exchange, authorization, tool
+access, and agent interoperability. Clinical multi-agent deployment may additionally require controls
+for identity, attribution, scope enforcement, dependency tracking, escalation, and population-level
+coordination. We introduce CIRC, Clinical Infrastructure for Reliable Coordination, a conceptual
+governance framework intended to stimulate protocol design rather than establish a standard. CIRC
+describes four coordination levels, from isolated agents operating through existing EHR interfaces to
+system-aware populations coordinating over aggregate resource and acuity signals, and identifies five
+protocol primitives associated with those levels. Using a hypothetical oncology vignette, we illustrate
+how interaction risks could emerge at each level and how richer infrastructure could create decision
+points for escalation, review, and failure containment. We conclude with implications for standards
+bodies, deploying institutions, and regulators, including simulation-based stress testing before live
+deployment and post-deployment monitoring in clinical practice.
+\end{abstract}
+
+\section{Introduction}
+
+Clinical artificial intelligence (AI) is shifting from decision support toward the possibility of
+autonomous action by AI agents. Traditional medical AI systems advise clinicians, who remain
+responsible for clinical decisions and downstream actions. A new generation of agents may schedule
+appointments, initiate referrals, manage prior authorization, and coordinate multispecialty care with
+minimal human intervention.\cite{moritz2025coordinated,borkowski2025multiagent,taylor2025agents} This
+transition from advisory to agentic systems is a qualitative change in how AI participates in
+healthcare delivery, one that current interoperability infrastructure was not designed to support.
+
+The challenge is architectural mismatch. Healthcare's dominant standards, including FHIR, SMART on
+FHIR, and CDS Hooks, were designed primarily for episodic data exchange between human-operated
+systems, with the assumption that humans initiate or mediate clinical actions.\cite{hl7fhir2019,
+hl7cdshooks2018,mandel2016smart} Autonomous agents may strain that assumption: they could coordinate
+continuously rather than episodically, act in seconds rather than hours, and operate as interacting
+populations whose decisions cascade across organizational boundaries. Potential failures include
+resource exhaustion from uncoordinated optimization, silent scope violations, cascading pipeline
+errors, and patient-facing actions that resist oversight or reversal.
+
+Throughout this Perspective, we follow a hypothetical 68-year-old woman receiving agent-enabled care
+for HER2-positive breast cancer. She has diabetes, chronic kidney disease, and treatment-associated
+thrombocytopenia. Oncology, symptom-triage, diabetes-management, cardio-oncology, and scheduling agents
+each process a portion of her record. In the adverse trajectory used for illustration, fragmented
+signals and workflow changes precede a late-detected subdural hematoma. The scenario is not a clinical
+prediction or claim of preventability; it is intended to expose coordination questions that can arise
+when no actor has responsibility for the joint state of the system.
+
+These are interaction risks: harms that emerge when multiple agents act locally within a shared
+clinical environment. A scheduling, oncology, diabetes, and triage agent may each satisfy local safety
+criteria while jointly producing unsafe care. Traditional AI evaluation asks whether one model
+produces correct outputs under specified conditions; multi-agent deployment additionally asks whether
+a population of agents remains safe when actions interact through shared patients, resources, and
+workflows. Addressing this question may require infrastructure that can observe agent actions, enforce
+boundaries, track dependencies, and intervene before local decisions propagate.
+
+We introduce CIRC, Clinical Infrastructure for Reliable Coordination, a conceptual governance
+framework intended to stimulate protocol design rather than a proposed standard. CIRC reframes
+clinical agent safety around controls for monitoring, constraining, and coordinating agents as they
+scale. This Perspective makes four contributions. First, we identify four architectural gaps that may
+emerge when autonomous agents are deployed atop existing interoperability infrastructure. Second, we
+define five protocol primitives for monitoring and controlling multi-agent clinical systems. Third, we
+propose four descriptive coordination levels, CIRC-L1 through CIRC-L4. Fourth, we argue that
+interaction risk should be studied at the population level and outline simulation as one approach for
+surfacing it before deployment.
+
+\section{Why existing infrastructure may be insufficient for clinical agents}
+
+Healthcare has invested decades in interoperability infrastructure, including HL7v2 for real-time
+clinical messaging, FHIR for structured clinical data exchange, SMART on FHIR for application
+authorization, and CDS Hooks for decision support at defined workflow trigger points.\cite{hl7v251,
+hl7fhir2019,mandel2016smart,hl7cdshooks2018} These standards are important achievements and could be
+adapted to support portions of clinical agent coordination. Missing fields, triggers, or scopes may in
+some cases be addressed through profiles, implementation guides, workflow engines, or vendor
+extensions. Other gaps concern assumptions about accountable actors, persistent identity, and the
+context needed to govern autonomous action across systems.
+
+The broader AI ecosystem has begun addressing agent interoperability through protocols such as
+Google's Agent-to-Agent protocol, Anthropic's Model Context Protocol, and IBM's Agent Communication
+Protocol.\cite{googlea2a2025,anthropicmcp2024,ibmacp2025} A2A and ACP support communication,
+capability discovery, task management, and message exchange, while MCP standardizes how AI systems
+connect to tools and data sources. Clinical deployments add constraints that these general protocols
+do not themselves standardize. Agents may pursue partially conflicting objectives, and some clinical
+failures cannot be safely handled through retry because downstream actions may be difficult to
+reverse. The central problem is therefore not only capability discovery but capability constraint:
+what an agent may do, for which patients, under which conditions, with which approvals, and how it
+must coordinate when its actions intersect with others.
+
+Existing AI risk frameworks characterize what can go wrong. The AI Risk Repository synthesizes more
+than 700 risks across 43 taxonomies, and the NIST AI Risk Management Framework organizes governance
+functions for trustworthy systems.\cite{slattery2024risk,nist2023airmf} Clinical agent benchmarks
+evaluate whether individual agents perform correctly in realistic environments.\cite{jiang2025medagentbench,
+ferber2025oncology} Multi-agent clinical deployment additionally raises questions about interacting
+agents acting concurrently on shared patients, finite resources, and institutional workflows. Four
+gaps illustrate this distinction.
+
+\subsection*{Insufficient agent observability and attribution}
+
+As agents move from recommending actions to initiating orders, updating documentation, routing
+referrals, or modifying schedules, audit infrastructure must distinguish human-authored actions,
+human-approved agent actions, and autonomous agent-initiated actions. Current mechanisms are commonly
+organized around user accounts, applications, service credentials, and record modifications rather
+than persistent agent identity across vendors and institutions. FHIR Provenance can represent that a
+system, practitioner, organization, or device participated in an activity, but implementations do not
+generally require a cross-vendor mechanism for cryptographically verifiable agent identity, model
+version, authorization context, and cross-organizational persistence. Without this context,
+adverse-event review may struggle to reconstruct which agent acted, under whose authority, and within
+which scope.
+
+\subsection*{Missing intent and dependency protocols}
+
+Clinical coordination requires expressing dependencies across disease-focused, patient-focused,
+capability-focused, and operational agents. A diabetes-management agent, oncology agent,
+record-summarization agent, and imaging-scheduling agent may each impose constraints on one care
+pathway. These constraints can include prerequisites, timing windows, resource needs, escalation
+rules, data-access limits, and reversal obligations. Healthcare standards can exchange data and invoke
+workflow hooks, while general-purpose agent protocols can communicate and hand off tasks. Neither
+category, by itself, standardizes a clinical dependency protocol that obliges agents to declare how a
+proposed action affects downstream workflows and patient state before execution.
+
+\subsection*{Capability boundaries scoped to human roles}
+
+Healthcare defines role-based authority around expertise, licensure, institutional policy, and
+accountability. Agents require analogous constraints, potentially with broad reading privileges but
+strict acting privileges. SMART on FHIR provides application-level authorization to data and services,
+but these scopes do not encode the complete clinical action context of autonomous behavior. A diabetes
+agent might be allowed to recommend insulin adjustments in one setting, require pharmacist approval
+in another, and be prohibited from acting autonomously in a third. Clinical deployments therefore may
+need enforceable declarations of what an agent can do, for whom, under which conditions, and through
+which escalation path.
+
+\subsection*{Limited system-level resource coordination}
+
+When many agents independently conclude that the same time window is optimal for imaging, infusion,
+discharge planning, or specialist review, they could collectively overwhelm shared resources even if
+each decision is locally reasonable. Prior work calls this type of convergence a ``digital
+stampede.''\cite{chopra2025ripple} Historical utilization statistics and single-agent benchmarks may
+not expose risks arising dynamically from the interaction of agents, patients, resources, and
+workflows. Existing standards can represent many relevant facts, and workflow engines can coordinate
+specified processes, but aggregate demand signals and population-level stress tests are not routinely
+standardized for clinical agent ecosystems.
+
+\section{The CIRC framework: Levels of Coordination for Clinical Agents}
+
+CIRC can be understood as a set of protocol primitives intended to make agent interactions
+observable, bounded, coordinated, and auditable. These primitives are properties of a coordination
+layer rather than capabilities delegated to individual agents alone (Table~\ref{tab:primitives}).
+
+\begin{table}[htbp]
+\centering
+\caption{CIRC protocol primitives in the submitted framework.}
+\label{tab:primitives}
+\small
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.22\linewidth}YY}
+\toprule
+Primitive & Definition & Problem addressed \\
+\midrule
+Persistent agent identity & Clinically meaningful actions carry a verifiable agent identifier and
+version tag across organizations. & Attribution, authorization reconstruction, and adverse-event
+audit. \\
+Structured intent and coordination messages & Machine-readable proposed actions, temporal
+constraints, resource needs, clinical prerequisites, and dependencies. & Free-text and
+vendor-specific messages resist verification and negotiation. \\
+Explicit scope declarations & Signed declarations of authorized clinical scope, data permissions,
+and validated populations. & Scope violations may otherwise be visible only after propagation. \\
+Dependency tracking & Mechanisms linking actions to downstream obligations across clinical and
+administrative systems. & Partial reversal and missing prerequisites can create inconsistent state. \\
+Aggregate resource and priority signals & Privacy-preserving summaries of utilization, availability,
+and workflow backlog. & Independently optimizing agents can converge on the same constrained
+resources. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The submitted framework characterizes CIRC across four levels, with each level adding governance
+capabilities and technical sophistication. To ground the levels, it imagines a regional cancer
+network of two hospitals and three satellite infusion centers caring for approximately 4,000 patients
+receiving systemic therapy over six months. Within this hypothetical network, 180 women receive
+adjuvant chemotherapy for HER2-positive breast cancer.\cite{kim2022tchp,hockaday2024tchp} Their care
+is orchestrated by oncology-management, diabetes-coordination, cardio-oncology-monitoring, and
+scheduling agents.
+
+The recurring patient is a 68-year-old woman with diabetes, chronic kidney disease, and
+treatment-associated thrombocytopenia.\cite{kuter2022thrombocytopenia} Over several days, she reports
+dizziness and worsening headache. Her platelet count declines across cycles, glucose is elevated, and
+wearable data show subtle overnight heart-rate changes. Each signal is processed by a different
+agent. The scenario illustrates how infrastructure changes what becomes visible, when review may be
+triggered, and how failures might propagate or be contained.
+
+\subsection{CIRC-L1: Isolated agents}
+
+At Level 1, each agent connects to the EHR, scheduling systems, and decision-support tools through
+standard interfaces without awareness of concurrent agent activity. Interaction effects are not
+directly represented, so resource collisions and cross-domain prerequisite violations may become
+visible only downstream.
+
+In the hypothetical trajectory, the triage agent labels dizziness and worsening headache as low
+acuity. The oncology agent notes a platelet count of 68,000/$\mu$L and clears chemotherapy without
+capturing a decline from 95,000 to 82,000 to 68,000/$\mu$L. The diabetes agent responds to elevated
+glucose, while a scheduling agent advances imaging and cancels an observation visit. The example is
+constructed to show fragmented state, not to establish that these individual decisions are clinically
+correct or that CIRC would have prevented the outcome.
+
+\subsection{CIRC-L2: Vendor-bounded coordination}
+
+At Level 2, agents communicate with agents they know about, typically through common vendors or
+explicit integrations. They can exchange structured messages about proposed actions, constraints, and
+dependencies, but vendor relationships rather than clinical dependencies determine the coordination
+perimeter. This can create coordination islands and asymmetric visibility.
+
+For the hypothetical patient, an oncology agent can object when a same-vendor scheduling agent
+proposes moving imaging, but external diabetes, triage, and cardio-oncology agents remain outside the
+exchange. The example creates a decision point within one vendor while leaving cross-vendor signals
+fragmented.
+
+\begin{figure}[htbp]
+\centering
+\placeholderfigure{Submitted Figure 1: vendor-bounded coordination simulation}
+\caption{CIRC-L2 illustrative conceptual simulation: vendor-bounded coordination. The submitted
+caption describes a toy simulation across three vendor ecosystems. It is not based on clinical
+deployment, and no conclusions about protocol effectiveness should be drawn.}
+\label{fig:l2}
+\end{figure}
+
+\subsection{CIRC-L3: Universal protocol-mediated coordination}
+
+At Level 3, a shared coordination protocol enables agents from different vendors and institutions to
+exchange structured messages, declare capabilities and constraints, and coordinate over shared
+patient state. Governed pathways provide audit trails, constraints, and dependency exchange.
+
+In the hypothetical trajectory, an imaging-schedule adjustment notifies agents with registered
+dependencies regardless of vendor. Oncology and diabetes agents raise separate concerns, and a
+protocol rule directs the combined concerns to human review. Wearable data can be routed to an agent
+or clinician with the relevant scope. These mechanisms create opportunities for review; they do not
+establish that the alert is diagnostically valid or clinically effective.
+
+\begin{figure}[htbp]
+\centering
+\placeholderfigure{Submitted Figure 2: hypothetical error cascade}
+\caption{Hypothetical error propagation under different coordination levels. The submitted schematic
+contrasts an unchecked upstream error with a protocol-mediated cross-reference checkpoint. It is not
+a clinical performance estimate.}
+\label{fig:l3}
+\end{figure}
+
+\subsection{CIRC-L4: System-aware coordination}
+
+At Level 4, agents become aware of aggregate system state, including utilization, queue dynamics, and
+capacity constraints. The coordination layer publishes privacy-preserving summaries without exposing
+individual patient information. This could support digital-stampede prevention by allowing proposed
+actions to account for constrained resources before rejection.
+
+The submitted framework also associates Level 4 with population pattern detection. In its oncology
+example, a system learns that a combination of platelet decline, metabolic instability, reduced
+observation, and wearable abnormalities precedes intracranial hemorrhage. Such a function is a
+clinical prediction system rather than merely a coordination primitive. It would require independent
+development, validation, calibration, subgroup analysis, drift monitoring, and evaluation of false
+alerts before influencing individual care.
+
+\begin{figure}[htbp]
+\centering
+\placeholderfigure{Submitted Figure 3: distributed concern-signal aggregation}
+\caption{CIRC-L4 illustrative conceptual simulation: aggregation of distributed concern signals.
+The submitted toy example is not calibrated to clinical outcomes and should not be interpreted as an
+estimate of sensitivity, specificity, false-positive rate, or prevented harm.}
+\label{fig:l4}
+\end{figure}
+
+The progression across levels shifts the locus of control from isolated optimization to cross-vendor,
+patient-level, and population-level coordination. In the submitted framing, the patient's complexity
+is said to demand Level 3 or Level 4 infrastructure. That statement remains conceptual: the framework
+does not demonstrate that any level is necessary, sufficient, or superior to alternative
+architectures.
+
+\section{Limitations and future directions}
+
+CIRC identifies candidate primitives for multi-agent clinical governance but does not specify a
+complete implementation or demonstrate feasibility at scale. Questions remain about cross-vendor
+identity, representations for clinically ambiguous intent, adaptation of scope declarations, and
+coordination across institutional boundaries. Governance questions include liability, regulatory
+classification, institutional autonomy, and local configuration of agent boundaries. These questions
+will differ across regimes such as the FDA's device-centered framework and the European Union's
+risk-tiered AI Act.\cite{fda2021aiml,eu2024aiact}
+
+The illustrative simulations warrant particular caution. Their parameter choices are not calibrated
+against real-world data, populations are small, distributions are predetermined, and outcomes are
+known in advance. They illustrate mechanisms by which coordination might interrupt propagation,
+expose vendor-boundary gaps, or create review points. They do not estimate clinical sensitivity,
+specificity, harm reduction, or real-world performance.
+
+Future work should evaluate CIRC-style controls through progressively stronger evidence. Interaction
+risk concerns how agents act jointly on shared patients, resources, and workflows. Population-level
+simulation under matched workflow constraints could expose failures missed by single-agent benchmarks,
+but it would not establish clinical efficacy. Prospective studies would be needed to determine whether
+specific controls improve auditability, reduce unsafe propagation, preserve human oversight, or
+prevent system-level failures in clinical settings.
+
+\section{Conclusion}
+
+The hypothetical chemotherapy patient illustrates the central concern of multi-agent clinical AI:
+agents can process their local inputs as designed while no infrastructure represents the joint state
+of care. The submitted scenario attributes harm to an absence of required sharing, aggregation, and
+escalation. This remains an illustrative systems argument rather than evidence that a particular
+protocol would have prevented the clinical outcome.
+
+If autonomous agents scale in clinical practice, health systems may need stronger controls for
+attribution, structured intent, scope, dependency tracking, and aggregate resource awareness. CIRC
+offers one conceptual organization of these concerns. Building and testing coordination mechanisms
+before deployment could help institutions surface interaction failures without waiting for patient
+harm. The immediate task is to make clinical agent interactions more observable, bounded,
+coordinated, and testable while evaluating whether the proposed controls add value beyond existing
+standards and alternative architectures.
+
+\section*{Funding}
+This work was accomplished without funding.
+
+\section*{Competing interests}
+The authors declare no competing interests.
+
+\nocite{*}
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}
