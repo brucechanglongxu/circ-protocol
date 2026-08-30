@@ -13,7 +13,8 @@
   flow/.style={->, thick, draw=black!70},
   check/.style={<->, thick, draw=circgold!90!black},
   escalation/.style={<->, thick, draw=circblue!90!black},
-  edgelabel/.style={fill=white, inner sep=1.2pt, font=\sffamily\tiny}
+  edgelabel/.style={fill=white, inner xsep=1.5pt, inner ysep=0.8pt,
+    font=\sffamily\tiny, text=black!80}
 ]
   \node[agent] (agent1) at (-4.7,2.0) {Scheduling agent};
   \node[agent] (agent2) at (-1.5,2.0) {Clinical agent};
@@ -29,20 +30,30 @@
   \node[agent] (external) at (3.35,1.5) {External clinical agent};
   \node[control] (externaltrust) at (3.35,0.05) {Institution B identity\\and policy authority};
 
+  \coordinate (auditlane) at (-7.25,0.65);
+  \coordinate (auditturn) at (-7.25,-2.35);
+  \coordinate (escalationlane) at (1.25,0.65);
+  \coordinate (escalationturn) at (1.25,-2.35);
+
   \draw[flow] (agent1) -- (coord);
   \draw[flow] (agent2) -- (coord);
-  \draw[flow] (external) -- node[above, sloped, edgelabel]
+  \draw[flow] (external) -- node[midway, above=2pt, edgelabel]
     {signed, scoped intent} (coord);
-  \draw[check] (coord.south west) -- node[above, sloped, edgelabel] {state/action} (ehr.north);
-  \draw[check] (coord.south) -- node[right, edgelabel] {verify} (identity.north);
-  \draw[check] (coord.south east) -- node[above, sloped, edgelabel] {authorize} (policy.north);
-  \draw[flow] (coord.west) -- ++(-1.7,0) |- node[pos=0.82, below, edgelabel] {append} (audit.west);
-  \draw[escalation] (coord.east) -- ++(1.7,0) |- node[pos=0.82, below, edgelabel]
-    {escalate} (supervisor.east);
+  \draw[check] (coord.south west) -- node[midway, left=1pt, edgelabel]
+    {state / action} (ehr.north);
+  \draw[check] (coord.south) -- node[midway, right=2pt, edgelabel] {verify} (identity.north);
+  \draw[check] (coord.south east) -- node[midway, right=1pt, edgelabel]
+    {authorize} (policy.north);
+  \draw[flow] (coord.west) -- (auditlane) -- (auditturn)
+    -- node[midway, above=1pt, edgelabel] {append audit} (audit.west);
+  \draw[escalation] (coord.east) -- (escalationlane) -- (escalationturn)
+    -- node[midway, above=1pt, edgelabel] {escalate} (supervisor.east);
   \draw[check] (external) -- (externaltrust);
 
   \begin{scope}[on background layer]
-    \node[boundary, fit=(agent1)(agent2)(coord)(ehr)(identity)(policy)(audit)(supervisor),
+    \node[boundary,
+      fit=(agent1)(agent2)(coord)(ehr)(identity)(policy)(audit)(supervisor)
+          (auditlane)(auditturn)(escalationlane)(escalationturn),
       label={[font=\sffamily\bfseries\footnotesize]above left:Institution A}] {};
     \node[boundary, fit=(external)(externaltrust),
       label={[font=\sffamily\bfseries\footnotesize]above:Institution B}] {};
