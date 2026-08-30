@@ -32,3 +32,16 @@
   stating that it does not validate CIRC or test multi-agent coordination.
 - Added a staged evaluation agenda and explicit statements that the levers are not necessary,
   sufficient, minimal, or unique to CIRC.
+
+## Revision 2: standards and architecture alternatives
+
+- Replaced the claim that existing infrastructure is broadly insufficient with a capability-level
+  account of what FHIR, SMART, CDS Hooks, A2A, MCP, and workflow engines already provide.
+- Added a matrix separating current capabilities, extension or profile opportunities, and remaining
+  semantics, authorization, workflow, governance, and portability work.
+- Corrected the discussion of FHIR Task, Provenance, AuditEvent, Subscription, SMART Backend
+  Services, A2A authorization and task lifecycles, and MCP host-controlled isolation.
+- Positioned CIRC as an architecture-neutral requirements framework rather than a replacement
+  protocol.
+- Compared central orchestration, EHR-native workflows, policy engines, supervisory agents,
+  distributed protocols, and human-led coordination.

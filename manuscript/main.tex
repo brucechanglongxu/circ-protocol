@@ -96,27 +96,68 @@ clinical benchmark as a concrete example while making explicit which multi-agent
 untested. The levers are neither claimed to be minimal nor sufficient, and future extensions are
 expected.
 
-\section{Why existing infrastructure may be insufficient for clinical agents}
+\section{Existing infrastructure: capabilities and remaining gaps}
 
-Healthcare has invested decades in interoperability infrastructure, including HL7v2 for real-time
-clinical messaging, FHIR for structured clinical data exchange, SMART on FHIR for application
-authorization, and CDS Hooks for decision support at defined workflow trigger points.\cite{hl7v251,
-hl7fhir2019,mandel2016smart,hl7cdshooks2018} These standards are important achievements and could be
-adapted to support portions of clinical agent coordination. Missing fields, triggers, or scopes may in
-some cases be addressed through profiles, implementation guides, workflow engines, or vendor
-extensions. Other gaps concern assumptions about accountable actors, persistent identity, and the
-context needed to govern autonomous action across systems.
+Healthcare has invested decades in interoperability infrastructure, including HL7v2 for clinical
+messaging, FHIR for structured data and workflow resources, SMART on FHIR for application
+authorization, and CDS Hooks for workflow-triggered decision support.\cite{hl7v251,hl7fhir2019,
+mandel2016smart,hl7cdshooks2018,hl7smart2024} These standards already provide more of the substrate
+for agentic workflows than a simple ``data exchange'' characterization suggests. FHIR Provenance and
+AuditEvent can record actors, activities, policies, and outcomes. FHIR Task represents work state,
+owners, inputs, outputs, composite tasks, and links to formal workflow definitions; the specification
+explicitly accommodates both distributed task management and central workflow engines. Subscription
+supports event notification. SMART Backend Services authorizes headless applications, and CDS Hooks
+invokes services at defined clinical workflow events.
 
-The broader AI ecosystem has begun addressing agent interoperability through protocols such as
-Google's Agent-to-Agent protocol, Anthropic's Model Context Protocol, and IBM's Agent Communication
-Protocol.\cite{googlea2a2025,anthropicmcp2024,ibmacp2025} A2A and ACP support communication,
-capability discovery, task management, and message exchange, while MCP standardizes how AI systems
-connect to tools and data sources. Clinical deployments add constraints that these general protocols
-do not themselves standardize. Agents may pursue partially conflicting objectives, and some clinical
-failures cannot be safely handled through retry because downstream actions may be difficult to
-reverse. The central problem is therefore not only capability discovery but capability constraint:
-what an agent may do, for which patients, under which conditions, with which approvals, and how it
-must coordinate when its actions intersect with others.
+The broader AI ecosystem also provides substantial coordination machinery. A2A defines agent cards,
+signed capability descriptions, stateful tasks, task cancellation, streaming and push updates,
+authorization states, extensions, and security guidance.\cite{googlea2a2025,a2aspec2026} MCP defines
+a host-controlled architecture for connecting models to isolated tool and resource servers, with
+capability negotiation and host-enforced security boundaries.\cite{anthropicmcp2024,mcpspec2025}
+ACP-style protocols similarly support task and message exchange.\cite{ibmacp2025} The open question
+is therefore not whether these technologies can participate in clinical coordination. It is which
+healthcare-specific semantics and conformance expectations should be shared across implementations.
+
+Table~\ref{tab:standards} distinguishes capabilities already present from capabilities that are
+representable through profiles, extensions, or local infrastructure, and from governance contracts
+that are not yet consistently standardized. The boundary is not absolute. A health system can
+implement many CIRC levers today without waiting for a new standard; CIRC's proposed contribution is
+to connect those implementation choices to explicit risk and evidence requirements.
+
+\begin{table}[htbp]
+\centering
+\caption{Existing infrastructure and the narrower coordination questions raised by CIRC.}
+\label{tab:standards}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.16\linewidth}YY}
+\toprule
+Standard or approach & Capabilities already provided & Extension or governance work for clinical-agent use \\
+\midrule
+FHIR resources & Structured clinical data; Task lifecycle, ownership, inputs, outputs, and composite
+work; Provenance and AuditEvent; event subscriptions. & \textbf{Semantics and conformance:} profiles
+can encode agent versions, dependencies, and state, but common clinical-agent profiles, required
+fields, and cross-vendor behavior would need agreement. \\
+SMART on FHIR & OAuth-based authorization for user-facing and headless clients; patient and encounter
+context; resource-level scopes and token introspection. & \textbf{Authorization policy:} local
+policy can restrict actions, but patient-specific authority, degree of autonomy, approval conditions,
+and revocation across agents require explicit policy and enforcement. \\
+CDS Hooks & Synchronous invocation at named clinical workflow events; context and prefetch; cards,
+suggestions, and SMART app launch. & \textbf{Workflow:} useful for human-mediated checkpoints, but
+not a durable multi-agent dependency graph, transaction protocol, or population resource controller. \\
+A2A and ACP-style protocols & Agent discovery, capability advertisement, messages, stateful tasks,
+status updates, cancellation, authentication patterns, and extensions. & \textbf{Clinical
+governance:} healthcare intent, patient and encounter binding, action authority, clinical
+prerequisites, accountable escalation, and safe-mode semantics require domain profiles or local rules. \\
+MCP & Host-mediated access to tools, resources, and prompts; capability negotiation; isolation of
+server connections; host control of permissions and consent. & \textbf{Scope:} MCP can expose
+governed clinical tools, but it is not a peer-agent workflow or shared clinical dependency standard. \\
+Workflow and policy engines & Stateful orchestration, business rules, human tasks, access decisions,
+retries, timeouts, and compensation within a governed deployment. & \textbf{Implementation and
+portability:} these may implement CIRC levers locally; cross-vendor semantics, evidence exchange, and
+institutional trust remain deployment-specific unless profiled. \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 Existing AI risk frameworks characterize what can go wrong. The AI Risk Repository synthesizes more
 than 700 risks across 43 taxonomies, and the NIST AI Risk Management Framework organizes governance
@@ -126,42 +167,37 @@ ferber2025oncology} Multi-agent clinical deployment additionally raises question
 agents acting concurrently on shared patients, finite resources, and institutional workflows. Four
 gaps illustrate this distinction.
 
-\subsection*{Insufficient agent observability and attribution}
+\subsection*{Inconsistent agent observability and attribution}
 
 As agents move from recommending actions to initiating orders, updating documentation, routing
-referrals, or modifying schedules, audit infrastructure must distinguish human-authored actions,
-human-approved agent actions, and autonomous agent-initiated actions. Current mechanisms are commonly
-organized around user accounts, applications, service credentials, and record modifications rather
-than persistent agent identity across vendors and institutions. FHIR Provenance can represent that a
-system, practitioner, organization, or device participated in an activity, but implementations do not
-generally require a cross-vendor mechanism for cryptographically verifiable agent identity, model
-version, authorization context, and cross-organizational persistence. Without this context,
-adverse-event review may struggle to reconstruct which agent acted, under whose authority, and within
-which scope.
+referrals, or modifying schedules, audit infrastructure should distinguish human-authored actions,
+human-approved agent actions, and autonomous agent-initiated actions. FHIR Provenance and AuditEvent
+can represent software actors, activities, policies, outcomes, and signatures. The remaining issue is
+implementation consistency: deployments would need profiles and policies requiring stable agent and
+model versions, delegation context, and links between the clinical action and its audit record.
+Without that consistency, adverse-event review may still struggle to reconstruct which agent acted,
+under whose authority, and within which scope.
 
-\subsection*{Missing intent and dependency protocols}
+\subsection*{Unstandardized clinical intent and dependency semantics}
 
 Clinical coordination requires expressing dependencies across disease-focused, patient-focused,
-capability-focused, and operational agents. A diabetes-management agent, oncology agent,
-record-summarization agent, and imaging-scheduling agent may each impose constraints on one care
-pathway. These constraints can include prerequisites, timing windows, resource needs, escalation
-rules, data-access limits, and reversal obligations. Healthcare standards can exchange data and invoke
-workflow hooks, while general-purpose agent protocols can communicate and hand off tasks. Neither
-category, by itself, standardizes a clinical dependency protocol that obliges agents to declare how a
-proposed action affects downstream workflows and patient state before execution.
+capability-focused, and operational agents. FHIR Task, RequestGroup, CarePlan, and workflow
+definitions can represent much of this structure, while A2A tasks and extensions can carry it across
+agents. The gap is a shared clinical profile specifying which prerequisites, timing windows, state
+versions, resource needs, escalation rules, and reversal obligations must be declared for a given
+class of autonomous action. Such a profile could extend existing standards rather than replace them.
 
-\subsection*{Capability boundaries scoped to human roles}
+\subsection*{Authorization without a shared model of clinical autonomy}
 
 Healthcare defines role-based authority around expertise, licensure, institutional policy, and
-accountability. Agents require analogous constraints, potentially with broad reading privileges but
-strict acting privileges. SMART on FHIR provides application-level authorization to data and services,
-but these scopes do not encode the complete clinical action context of autonomous behavior. A diabetes
-agent might be allowed to recommend insulin adjustments in one setting, require pharmacist approval
-in another, and be prohibited from acting autonomously in a third. Clinical deployments therefore may
-need enforceable declarations of what an agent can do, for whom, under which conditions, and through
-which escalation path.
+accountability. SMART scopes and A2A authorization mechanisms can authenticate applications, limit
+data access, and require additional authorization. Their policies are intentionally implementation
+specific. A clinical deployment still must define whether an agent may read, recommend, draft, place,
+or execute an action; for which patients and settings; and with which approval and escalation path.
+CIRC calls for these distinctions to be machine-readable and auditable, not for a replacement of
+OAuth, SMART, or institutional access-control systems.
 
-\subsection*{Limited system-level resource coordination}
+\subsection*{Locally implemented system-level resource coordination}
 
 When many agents independently conclude that the same time window is optimal for imaging, infusion,
 discharge planning, or specialist review, they could collectively overwhelm shared resources even if
@@ -170,7 +206,9 @@ stampede.''\cite{chopra2025ripple} Historical utilization statistics and single-
 not expose risks arising dynamically from the interaction of agents, patients, resources, and
 workflows. Existing standards can represent many relevant facts, and workflow engines can coordinate
 specified processes, but aggregate demand signals and population-level stress tests are not routinely
-standardized for clinical agent ecosystems.
+portable across clinical agent ecosystems. This is chiefly an implementation and governance gap:
+institutions may reasonably keep resource arbitration centralized rather than expose it through a
+peer-to-peer protocol.
 
 \section{A non-exhaustive taxonomy of clinical-agent risk}
 
@@ -293,6 +331,49 @@ orders; a supervisory agent may detect conflict; and direct agent-to-agent messa
 across vendors. Protocol-level fields are most useful where information must cross those boundaries,
 but CIRC does not assume that every control belongs in a new protocol or that decentralized agent
 communication is preferable to orchestration.
+
+\subsection{Implementation patterns and trade-offs}
+
+The same governance lever can be realized through different architectures
+(Table~\ref{tab:architectures}). The appropriate choice depends on institutional boundaries,
+workflow stability, latency, reversibility, and the consequences of coordinator failure.
+
+\begin{table}[htbp]
+\centering
+\caption{Alternative architectures for implementing CIRC governance levers.}
+\label{tab:architectures}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.19\linewidth}YY}
+\toprule
+Pattern & Principal strengths & Limitations and role of shared conventions \\
+\midrule
+Central workflow orchestrator & One authority for sequencing, retries, compensation, and human
+tasks; clear operational ownership. & Can become a bottleneck or single failure domain; cross-vendor
+inputs still need stable identity, intent, state, and outcome semantics. \\
+EHR-native workflow control & Close to orders, patient context, existing permissions, and clinician
+work queues. & May be vendor- or institution-specific and difficult to extend across external agents
+or non-EHR systems. \\
+Policy engine and identity layer & Centralized authorization, revocation, separation of duties, and
+consistent policy decisions. & Does not by itself coordinate task state, clinical prerequisites,
+resource contention, or human response. \\
+Supervisory agent & Can synthesize context and detect conflicts without requiring every peer to
+communicate directly. & Introduces another model failure surface; requires bounded authority,
+independent monitoring, and deterministic enforcement for consequential actions. \\
+Distributed agent protocol & Supports cross-vendor discovery, delegation, and task exchange without
+one workflow owner. & Increases consistency, trust, conflict-resolution, and outage-recovery demands;
+clinical profiles are needed above the transport. \\
+Human-led coordination & Uses existing professional accountability and adapts to unusual cases. &
+Limited by latency, workload, alert burden, and diffusion of responsibility; agent escalations still
+need named recipients and closure rules. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+CIRC is therefore best understood as an architecture-neutral requirements framework. It asks whether
+the chosen design can provide each needed control and its evidence trail. A FHIR implementation guide,
+an A2A clinical extension, or a local orchestration policy could each satisfy portions of that
+contract. A new protocol primitive is warranted only where existing representations cannot express a
+required concept or where cross-system conformance cannot otherwise be achieved.
 
 \section{From risk taxonomy to evaluation}
 
