@@ -45,3 +45,17 @@
   protocol.
 - Compared central orchestration, EHR-native workflows, policy engines, supervisory agents,
   distributed protocols, and human-led coordination.
+
+## Revision 3: failure model and operational oversight
+
+- Defined the coordination layer as a potential common-mode failure source rather than only a safety
+  mechanism.
+- Added identity, state and messaging, dependency, resource-arbitration, coordination-service, and
+  human-control failure surfaces with explicit containment behavior.
+- Specified action-class safe modes for read-only, reversible administrative, consequential clinical,
+  and emergency workflows.
+- Clarified federated identity, trust anchors, revocation, and the distinction between attribution
+  and clinical authority.
+- Replaced generic ``human review'' language with an operational escalation contract covering
+  ownership, acknowledgement, deadlines, fallback, suspension authority, workload, and closure.
+- Added measurable human-response endpoints and sociotechnical and automation references.

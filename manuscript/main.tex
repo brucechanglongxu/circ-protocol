@@ -375,12 +375,106 @@ an A2A clinical extension, or a local orchestration policy could each satisfy po
 contract. A new protocol primitive is warranted only where existing representations cannot express a
 required concept or where cross-system conformance cannot otherwise be achieved.
 
+\section{Failure model and degraded operation}
+
+A coordination layer is itself safety-critical infrastructure and can create common-mode failure.
+CIRC therefore assumes that agents, credentials, messages, state stores, dependency models,
+coordinators, and human response processes can each fail or be compromised. It does not assume that
+failures are independent or benign. The framework does not prescribe a universal identity issuer or
+consistency algorithm; it requires each deployment to declare its trust anchors, revocation mechanism,
+state guarantees, and degraded behavior. This follows a zero-trust posture in which access is
+evaluated for the requesting subject, resource, and context rather than inferred from network
+location.\cite{rose2020zerotrust}
+
+Table~\ref{tab:failure-model} states the principal failure surfaces. The controls are illustrative:
+their adequacy depends on clinical consequences, timing, reversibility, and organizational boundaries.
+Classical state-machine replication can improve availability and consistency, for example, but does
+not make an incorrect dependency model clinically correct.\cite{schneider1990statemachine}
+
+\begin{table}[htbp]
+\centering
+\caption{Failure model for the clinical-agent coordination layer.}
+\label{tab:failure-model}
+\footnotesize
+\begin{tabularx}{\linewidth}{B{0.19\linewidth}YY}
+\toprule
+Failure surface & Illustrative failures & Required containment behavior \\
+\midrule
+Identity and trust & Compromised agent; false scope declaration; credential theft; stale or
+unrevoked credential; untrusted external issuer. & Verify issuer, audience, version, delegation, and
+revocation at decision time; reject or quarantine the actor; preserve evidence for incident review. \\
+State and messaging & Stale patient state; loss, duplication, reordering, or replay; conflicting
+versions; delayed acknowledgement; network partition. & Bind actions to state versions; use
+idempotency and replay protection; expose uncertainty; prevent irreversible execution on unresolved
+state. \\
+Dependency and workflow & Missing or incorrect prerequisite; cyclic dependency; deadlock or
+livelock; unbounded retry; partial cancellation or compensation. & Validate graphs, bound retries,
+detect cycles, propagate cancellation, and freeze the affected pathway when consistency cannot be
+restored. \\
+Arbitration and resource signals & Incorrect priority; manipulated or stale capacity; starvation;
+correlated demand; denial of service. & Authenticate and timestamp aggregate signals, enforce rate
+and fairness policies, detect concentration, and transfer allocation to a designated fallback. \\
+Coordination service & Outage, corrupted state, faulty arbitration, software update failure, or loss
+of quorum. & Use health checks and redundancy appropriate to risk; expose degraded status; restore
+from auditable checkpoints; avoid silent continuation under unknown control state. \\
+Human control path & Alert not delivered or acknowledged; wrong recipient; alert overload;
+automation bias; conflicting overrides; diffusion of responsibility. & Require named ownership,
+deadline and acknowledgement, fallback escalation, override authority, workload monitoring, and
+documented closure. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Safe mode should be defined by action class rather than by one universal ``fail closed'' rule.
+Read-only retrieval or analysis may continue during partial outage only when data freshness and
+missing coordination context are visible to the user. Reversible administrative actions may be
+queued, deduplicated, or released after explicit confirmation. Actions that change treatment, orders,
+medication, disposition, or other consequential clinical state should generally be held when identity,
+scope, prerequisite, or shared-state checks are unavailable. Emergency exceptions require a
+predefined institutional pathway; the coordination layer should not invent one at runtime. In every
+case, the system should identify which guarantees remain active, return control to a named role, and
+record how normal operation was restored.
+
+Cross-organizational identity requires federation rather than one global CIRC authority. Each
+institution can issue or recognize credentials under its own policy, while bilateral or network trust
+agreements define accepted issuers, assurance levels, claims, and revocation expectations. A valid
+identity establishes attribution, not clinical authority: authorization remains specific to the
+patient, action, setting, time, and delegated purpose.
+
+\section{Operational human oversight}
+
+``Human review'' is not a control unless it changes who is responsible for what happens next. Health
+IT safety is sociotechnical: performance depends on people, tasks, technology, organizations, and the
+environment in which they interact.\cite{sittig2010sociotechnical,carayon2006seips} Automation can
+also redistribute attention and authority rather than simply reduce workload.\cite{parasuraman2000automation}
+CIRC therefore treats oversight as an operational contract, not an endpoint label.
+
+Every escalation should specify: (1) the accountable role and current assignee; (2) the triggering
+condition and supporting evidence; (3) the decision or action requested; (4) urgency and a response
+deadline; (5) whether the proposed action is blocked, queued, or continuing; (6) the fallback recipient
+and behavior after non-response; and (7) the event that closes the escalation. Assignment, delivery,
+acknowledgement, decision, override, and closure should be distinct auditable states.
+
+Institutions must also define governance outside the immediate alert. A designated body should
+approve agent scopes and material changes; operational owners should be able to pause an agent;
+credential and policy administrators should revoke access; and a clinical authority should resolve
+conflicting recommendations. Separation of duties is important when one vendor supplies both the
+acting agent and the supervisory component. Escalation policies should suppress duplicates, group
+related concerns, set alert budgets, and monitor acknowledgement and override patterns so that adding
+a coordination layer does not simply add another source of alert fatigue.
+
+Useful oversight measures include time to assignment, acknowledgement, and decision; fraction of
+escalations with no response by deadline; fallback activation; duplicate-alert rate; override and
+reversal rate; unresolved workload per accountable role; and the fraction of consequential actions
+executed without documented closure. These measures evaluate the response process rather than merely
+counting alerts.
+
 \section{From risk taxonomy to evaluation}
 
 The taxonomy separates three questions that were conflated in the submitted simulations. First, can
 a risk be observed? Candidate measures include attribution completeness, stale-state reads,
 unresolved dependencies, duplicated or conflicting actions, retry amplification, queue concentration,
-and unowned escalations. Second, can a control detect or contain the risk without blocking valid work?
+safe-mode activation, and unowned or overdue escalations. Second, can a control detect or contain the risk without blocking valid work?
 Matched stress tests should report both fault containment and preservation of unaffected workflows.
 Third, does the control improve clinical or operational outcomes? That question requires prospective
 evaluation and cannot be inferred from a deterministic demonstration.
@@ -414,14 +508,14 @@ cross-vendor messaging, shared-resource control, human response, or prevented pa
 population-level clinical prediction is outside the scope of a coordination framework and must be
 developed and validated as a separate clinical model.
 
-Implementation questions remain about identity issuance and revocation, consistency guarantees,
-message loss and replay, network partitions, privacy-preserving aggregation, and safe behavior during
-coordination-layer outage. Governance questions include liability, regulatory classification,
-institutional autonomy, local configuration, alert burden, and equitable access. These issues will
-play out differently under regimes such as the FDA's device-centered framework and the European
-Union's risk-tiered AI Act.\cite{fda2021aiml,eu2024aiact} Future work should compare protocol,
-orchestration, policy-engine, EHR-native, and human-led implementations against common risk-specific
-endpoints.
+The threat model and oversight contract identify requirements but do not establish that any proposed
+implementation will satisfy them. Choices about trusted issuers, consistency, emergency exceptions,
+response deadlines, and safe-mode behavior remain institution- and action-specific. Governance
+questions also include liability, regulatory classification, local configuration, alert burden, and
+equitable access. These issues will play out differently under regimes such as the FDA's
+device-centered framework and the European Union's risk-tiered AI Act.\cite{fda2021aiml,eu2024aiact}
+Future work should compare protocol, orchestration, policy-engine, EHR-native, and human-led
+implementations against common risk-specific endpoints.
 
 \section{Conclusion}
 
